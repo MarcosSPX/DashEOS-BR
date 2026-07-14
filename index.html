@@ -468,6 +468,7 @@
         </div>
         <div class="kpi-right">
             <div class="kpi-icon cyan"><i class="fas fa-chart-line"></i></div>
+            <div class="kpi-trend trend-cyan" id="kpi-idle-status">Meta: 95%</div>
         </div>
     </div>
 </div>
@@ -532,6 +533,7 @@
                     <div class="kpi-value" style="color: var(--accent-cyan);" id="br-idle-val">0%</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
                     <div class="kpi-trend trend-danger" id="br-idle-status">Gap: -0.0%</div>
                 </div>
             </div>
@@ -541,6 +543,7 @@
                     <div class="kpi-value" style="color: var(--accent-yellow);" id="br-opa-val">0%</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
                     <div class="kpi-trend trend-warning" id="br-opa-status">Gap: -0.0%</div>
                 </div>
             </div>
@@ -550,6 +553,7 @@
                     <div class="kpi-value" style="color: var(--accent-green);" id="br-ddsma-val">0%</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
                     <div class="kpi-trend trend-up" id="br-ddsma-status">Meta OK</div>
                 </div>
             </div>
@@ -559,6 +563,7 @@
                     <div class="kpi-value" style="color: var(--accent-purple);" id="br-ddqa-val">0%</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
                     <div class="kpi-trend trend-danger" id="br-ddqa-status">Gap: -0.0%</div>
                 </div>
             </div>
@@ -606,6 +611,7 @@
                     <div class="kpi-value" style="color: var(--accent-cyan);" id="cd-idle-val">-</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
                     <div class="kpi-trend" id="cd-idle-status">-</div>
                 </div>
             </div>
@@ -615,6 +621,7 @@
                     <div class="kpi-value" style="color: var(--accent-yellow);" id="cd-opa-val">-</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
                     <div class="kpi-trend" id="cd-opa-status">-</div>
                 </div>
             </div>
@@ -624,6 +631,7 @@
                     <div class="kpi-value" style="color: var(--accent-green);" id="cd-ddsma-val">-</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
                     <div class="kpi-trend" id="cd-ddsma-status">-</div>
                 </div>
             </div>
@@ -633,6 +641,7 @@
                     <div class="kpi-value" style="color: var(--accent-purple);" id="cd-ddqa-val">-</div>
                 </div>
                 <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
                     <div class="kpi-trend" id="cd-ddqa-status">-</div>
                 </div>
             </div>
@@ -679,11 +688,17 @@
                     <div class="kpi-label">IDLE da Área</div>
                     <div class="kpi-value" style="color: var(--accent-cyan);" id="area-idle-val">-</div>
                 </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
+                </div>
             </div>
             <div class="kpi-card" style="border-color: var(--accent-yellow);">
                 <div class="kpi-left">
                     <div class="kpi-label">OPA da Área</div>
                     <div class="kpi-value" style="color: var(--accent-yellow);" id="area-opa-val">-</div>
+                </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
                 </div>
             </div>
             <div class="kpi-card" style="border-color: var(--accent-green);">
@@ -691,11 +706,17 @@
                     <div class="kpi-label">DDSMA da Área</div>
                     <div class="kpi-value" style="color: var(--accent-green);" id="area-ddsma-val">-</div>
                 </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
+                </div>
             </div>
             <div class="kpi-card" style="border-color: var(--accent-purple);">
                 <div class="kpi-left">
                     <div class="kpi-label">DDQA da Área</div>
                     <div class="kpi-value" style="color: var(--accent-purple);" id="area-ddqa-val">-</div>
+                </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
                 </div>
             </div>
         </div>
@@ -739,7 +760,10 @@
             <div class="kpi-card" style="border-color: var(--border);">
                 <div class="kpi-left">
                     <div class="kpi-label">Meta Definida</div>
-                    <div class="kpi-value" style="color: var(--text-dim);" id="ind-meta-val">95%</div>
+                    <div class="kpi-value" style="color: var(--text-dim);" id="ind-meta-val">-</div>
+                </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--text-dim); background: rgba(255, 255, 255, 0.05);"><i class="fas fa-bullseye"></i></div>
                 </div>
             </div>
             <div class="kpi-card" style="border-color: var(--accent-blue);">
@@ -747,11 +771,17 @@
                     <div class="kpi-label">Realizado</div>
                     <div class="kpi-value" style="color: var(--accent-blue);" id="ind-realizado-val">-</div>
                 </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" style="color: var(--accent-blue); background: rgba(47, 129, 247, 0.1);"><i class="fas fa-chart-line"></i></div>
+                </div>
             </div>
             <div class="kpi-card" id="ind-gap-card">
                 <div class="kpi-left">
                     <div class="kpi-label">Gap Operacional</div>
                     <div class="kpi-value" id="ind-gap-val">-</div>
+                </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" id="ind-gap-icon"><i class="fas fa-minus-circle"></i></div>
                 </div>
             </div>
             <div class="kpi-card" id="ind-status-card">
@@ -759,6 +789,44 @@
                     <div class="kpi-label">Status Analítico</div>
                     <div class="kpi-value" id="ind-status-val">-</div>
                 </div>
+                <div class="kpi-right">
+                    <div class="kpi-icon" id="ind-status-icon"><i class="fas fa-info-circle"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-container" style="padding-top: 5px;">
+            <div class="chart-box c-span-4">
+                <div class="chart-box-header">
+                    <div class="chart-title-left"><i class="fas fa-calendar-day" style="color: var(--accent-cyan)"></i> Evolução Diária</div>
+                </div>
+                <canvas id="chartIndDaily"></canvas>
+            </div>
+            <div class="chart-box c-span-4">
+                <div class="chart-box-header">
+                    <div class="chart-title-left"><i class="fas fa-calendar-week" style="color: var(--accent-yellow)"></i> Evolução Semanal</div>
+                </div>
+                <canvas id="chartIndWeekly"></canvas>
+            </div>
+            <div class="chart-box c-span-4">
+                <div class="chart-box-header">
+                    <div class="chart-title-left"><i class="fas fa-calendar-alt" style="color: var(--accent-purple)"></i> Evolução Mensal</div>
+                </div>
+                <canvas id="chartIndMonthly"></canvas>
+            </div>
+
+            <!-- Heatmaps de Detalhamento do Indicador -->
+            <div class="chart-box c-span-6" style="height: auto; min-height: 200px;">
+                <div class="chart-box-header">
+                    <div class="chart-title-left"><i class="fas fa-th" style="color: var(--shopee-orange)"></i> Heatmap por Turno</div>
+                </div>
+                <div id="indTurnoHeatmapContainer" style="padding: 10px 0;"></div>
+            </div>
+            <div class="chart-box c-span-6" style="height: auto; min-height: 200px;">
+                <div class="chart-box-header">
+                    <div class="chart-title-left"><i class="fas fa-users" style="color: var(--accent-blue)"></i> Heatmap por Supervisor</div>
+                </div>
+                <div id="indSupervisorHeatmapContainer" style="padding: 10px 0;"></div>
             </div>
         </div>
     </div>
@@ -778,12 +846,13 @@
             <table id="mainTable">
                 <thead>
                     <tr>
-                        <th>Data/Hora</th>
-                        <th>CD</th>
+                        <!-- Colunas reordenadas e renomeadas exatamente conforme solicitado -->
+                        <th>Data Registro</th>
+                        <th>CD Operacional</th>
                         <th>Turno</th>
-                        <th>Nome Responsável</th>
+                        <th>Responsável</th>
                         <th>Cargo</th>
-                        <th>Área</th>
+                        <th>Área Atuação</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -795,147 +864,206 @@
 <script>
     Chart.register(ChartDataLabels);
 
-    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1wTNxkSsq3RAdzJ7n8NLFvwLHvR-_T6SnunsCXRopGcY/export?format=csv&gid=0';
+    // Link do Web App do Google Apps Script
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbycoVam3_qcF0EvFEFwSxklgqS2FyanzIGAXBU26UEeFEfrB7GYx985bjcoRnd09etQ/exec';
     const CACHE_KEY = 'eos_dashboard_cache';
     const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
-
+    
     function showToast(msg, persist = false) {
         const toast = document.getElementById('toastNotification');
         const toastMsg = document.getElementById('toastMessage');
-        if (!toast || !toastMsg) return;
         toastMsg.innerText = msg;
         toast.style.display = 'flex';
-        if (!persist) setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        if (!persist) {
+            setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        }
     }
     
     function hideToast() {
-        const toast = document.getElementById('toastNotification');
-        if (toast) toast.style.display = 'none';
+        document.getElementById('toastNotification').style.display = 'none';
     }
 
     function showErrorOverlay(msg) {
-        const overlay = document.getElementById('errorOverlay');
-        const errorMsg = document.getElementById('errorMessage');
-        if (overlay) overlay.style.display = 'flex';
-        if (errorMsg) errorMsg.innerText = msg;
-        const loading = document.getElementById('loadingOverlay');
-        if (loading) loading.style.display = 'none';
+        document.getElementById('errorOverlay').style.display = 'flex';
+        document.getElementById('errorMessage').innerText = msg;
+        document.getElementById('loadingOverlay').style.display = 'none';
     }
 
+    function hideErrorOverlay() {
+        document.getElementById('errorOverlay').style.display = 'none';
+    }
+
+    // Leitor de CSV com Mapeamento Estrito da Estrutura Oficial
     function parseCSV(text) {
-        const lines = text.split(/\r?\n/);
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
         if (lines.length === 0) return [];
+
         const separator = (lines[0].match(/;/g) || []).length > (lines[0].match(/,/g) || []).length ? ';' : ',';
 
         const parseLine = (line) => {
             const result = [];
-            let current = '', inQuotes = false;
+            let current = '';
+            let inQuotes = false;
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 if (char === '"') inQuotes = !inQuotes;
-                else if (char === separator && !inQuotes) { result.push(current.trim()); current = ''; }
-                else { current += char; }
+                else if (char === separator && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else current += char;
             }
             result.push(current.trim());
             return result.map(val => val.replace(/^"|"$/g, '').trim());
         };
 
-        const headers = parseLine(lines[0]);
-        const headerMap = { data: -1, cd: -1, resp: -1, cargo: -1, turno: -1, area: -1, ddsma: -1, ddqa: -1, idleBase: -1, idleReal: -1, idlePct: -1, opa: -1 };
-
-        headers.forEach((h, idx) => {
-            const n = h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (n === "data registro") headerMap.data = idx;
-            else if (n === "cd operacional") headerMap.cd = idx;
-            else if (n === "responsavel") headerMap.resp = idx;
-            else if (n === "cargo") headerMap.cargo = idx;
-            else if (n === "turno") headerMap.turno = idx;
-            else if (n === "area atuacao") headerMap.area = idx;
-            else if (n === "ddsma") headerMap.ddsma = idx;
-            else if (n === "ddqa") headerMap.ddqa = idx;
-            else if (n === "idle time") headerMap.idleBase = idx;
-            else if (n === "idle time real") headerMap.idleReal = idx;
-            else if (n === "idle time %") headerMap.idlePct = idx;
-            else if (n === "opa") headerMap.opa = idx;
-        });
-
-        const data = [];
+        const parsedRows = [];
+        // Ignora o cabeçalho e processa baseado na ordem fixa da planilha
         for (let i = 1; i < lines.length; i++) {
             const cols = parseLine(lines[i]);
-            if (cols.length < 5) continue;
+            if (cols.length < 6) continue;
 
-            data.push({
-                dataHora: cols[headerMap.data] || "",
-                cd: cols[headerMap.cd] || "",
-                responsavel: cols[headerMap.resp] || "",
-                cargo: cols[headerMap.cargo] || "",
-                turno: cols[headerMap.turno] || "",
-                area: (cols[headerMap.area] || "").trim().toUpperCase(),
-                ddsma: cols[headerMap.ddsma] || "",
-                ddqa: cols[headerMap.ddqa] || "",
-                idle_b: cols[headerMap.idleBase] || "",
-                idle_r: cols[headerMap.idleReal] || "",
-                idle_p: cols[headerMap.idlePct] || "",
-                opa: cols[headerMap.opa] || ""
+            parsedRows.push({
+                dataHora: cols[0] || "",
+                cd: cols[1] || "",
+                responsavel: cols[2] || "",
+                cargo: cols[3] || "",
+                turno: cols[4] || "",
+                area: cols[5] || "",
+                ddsma: cols[6] || "",
+                ddsma_just: cols[7] || "",
+                ddqa: cols[8] || "",
+                ddqa_just: cols[9] || "",
+                idle_plan: cols[10] || "",
+                idle_real: cols[11] || "",
+                idle_pct: cols[12] || "",
+                opa: cols[13] || "",
+                opa_just: cols[14] || ""
             });
         }
-        return data;
+        return parsedRows;
     }
 
     async function fetchSpreadsheetData() {
         try {
             const response = await fetch(SPREADSHEET_URL);
-            if (!response.ok) throw new Error("Erro de conexão.");
-            const text = await response.text();
-            if (text.includes("<!DOCTYPE html>")) throw new Error("Erro: Planilha não publicada.");
-            const data = parseCSV(text);
-            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+            if (!response.ok) throw new Error("Falha na conexão HTTP.");
+            
+            const contentType = response.headers.get("content-type") || "";
+            let rawData = [];
+            
+            if (contentType.includes("json")) {
+                const json = await response.json();
+                const rows = Array.isArray(json) ? json : (json.data || []);
+                rawData = rows.map(item => ({
+                    dataHora: item["Data Registro"] || item.dataHora || "",
+                    cd: item["CD Operacional"] || item.cd || "",
+                    responsavel: item["Responsável"] || item.responsavel || "",
+                    cargo: item["Cargo"] || item.cargo || "",
+                    turno: item["Turno"] || item.turno || "",
+                    area: item["Área Atuação"] || item.area || "",
+                    ddsma: item["DDSMA"] || "",
+                    ddqa: item["DDQA"] || "",
+                    idle_plan: item["IDLE TIME"] || "",
+                    idle_real: item["IDLE TIME REAL"] || "",
+                    idle_pct: item["IDLE TIME %"] || "",
+                    opa: item["OPA"] || ""
+                }));
+            } else {
+                const text = await response.text();
+                if (text.includes("<!DOCTYPE html>")) throw new Error("Acesso negado ao script.");
+                rawData = parseCSV(text);
+            }
+            
+            if (rawData.length === 0) throw new Error("Base de dados vazia.");
+            localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
             document.getElementById('sync-status').innerText = "BASE OPERACIONAL ATIVA";
             document.getElementById('sync-status').className = "kpi-trend trend-up";
-            hideToast();
-            return data;
+            return rawData;
         } catch (e) {
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) { document.getElementById('sync-status').innerText = "OFFLINE"; return JSON.parse(cached); }
+            console.error(e);
+            const cache = localStorage.getItem(CACHE_KEY);
+            if (cache) return JSON.parse(cache);
             throw e;
         }
     }
 
     const Dashboard = {
-        rawData: [], filteredData: [], charts: {}, idleCharts: {}, currentMode: 'padrao', extraAreaFilter: '',
-        meses: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
-        dias: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
+        rawData: [],
+        filteredData: [],
+        charts: {},
+        idleCharts: {},
+        currentMode: 'padrao',
+        extraAreaFilter: '',
+
+        mesesMapeados: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+        diasSemanaEixo: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
+        listaCDsGerais: [],
+        turnosEixo: [],
 
         async init() {
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
+            this.startClock();
+            document.getElementById('loadingOverlay').style.display = 'flex';
             try {
                 const data = await fetchSpreadsheetData();
-                this.rawData = data.map(item => {
-                    let dObj = new Date();
-                    const dStr = item.dataHora.split(' ')[0];
-                    if (dStr.includes('/')) { const p = dStr.split('/'); dObj = new Date(p[2], p[1]-1, p[0]); }
-                    return { ...item, dObj, mes: this.meses[dObj.getMonth()], diaSem: this.dias[dObj.getDay() === 0 ? 6 : dObj.getDay()-1] };
-                });
-                this.cds = [...new Set(this.rawData.map(d => d.cd))].filter(Boolean).sort();
-                this.turnos = [...new Set(this.rawData.map(d => d.turno))].filter(Boolean).sort();
-                this.buildFilters();
+                this.processSpreadsheetData(data);
                 this.createCharts();
                 this.createIdleCharts();
                 this.applyFilters();
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (e) { showErrorOverlay(e.message); }
+            } catch (e) {
+                showErrorOverlay(e.message);
+            }
         },
 
-        buildFilters() {
-            const pop = (id, list, label) => {
+        startClock() {
+            setInterval(() => {
+                const el = document.getElementById('clock');
+                if(el) el.innerText = new Date().toLocaleTimeString('pt-BR');
+            }, 1000);
+        },
+
+        processSpreadsheetData(data) {
+            this.rawData = data.map(item => {
+                // Validação e Conversão de Data
+                let dObj = new Date();
+                try {
+                    const cleanDate = item.dataHora.split(' ')[0];
+                    const parts = cleanDate.split('/');
+                    if(parts.length === 3) dObj = new Date(parts[2], parts[1]-1, parts[0]);
+                } catch(e) {}
+
+                // Normalização de Textos
+                const normalize = (val) => (val || "").toString().trim().toUpperCase();
+                
+                return {
+                    ...item,
+                    dataObj: dObj,
+                    cd: normalize(item.cd),
+                    area: normalize(item.area),
+                    turno: normalize(item.turno),
+                    mes: this.mesesMapeados[dObj.getMonth()] || "Desconhecido",
+                    diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay() - 1]
+                };
+            }).filter(d => d.cd !== "" && d.dataHora !== "" && !d.dataHora.includes("%"));
+
+            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].sort();
+            this.turnosEixo = [...new Set(this.rawData.map(d => d.turno))].sort();
+            this.buildDropdownOptions();
+        },
+
+        buildDropdownOptions() {
+            const injetar = (id, lista, label) => {
                 const el = document.getElementById(id);
-                el.innerHTML = `<option value="">${label}</option>` + list.map(i => `<option value="${i}">${i}</option>`).join('');
+                if(!el) return;
+                el.innerHTML = `<option value="">${label}</option>` + lista.map(i => `<option value="${i}">${i}</option>`).join('');
             };
-            pop('filter-mes', [...new Set(this.rawData.map(d => d.mes))], 'Todos os Meses');
-            pop('filter-turno', this.turnos, 'Todos os Turnos');
-            pop('filter-cd', this.cds, 'Todos os CDs');
-            pop('filter-cargo', [...new Set(this.rawData.map(d => d.cargo))].filter(Boolean).sort(), 'Todos os Cargos');
-            document.getElementById('dropdownHeatmapCD').innerHTML = '<option value="GERAL">Visão Geral</option>' + this.cds.map(c => `<option value="${c}">${c}</option>`).join('');
+            injetar('filter-mes', [...new Set(this.rawData.map(d => d.mes))], 'Todos os Meses');
+            injetar('filter-turno', this.turnosEixo, 'Todos os Turnos');
+            injetar('filter-cd', this.listaCDsGerais, 'Todos os CDs');
+            injetar('filter-cargo', [...new Set(this.rawData.map(d => d.cargo))].sort(), 'Todos os Cargos');
+            
+            const dropHeat = document.getElementById('dropdownHeatmapCD');
+            if(dropHeat) dropHeat.innerHTML = '<option value="GERAL">Visão Geral</option>' + this.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
         },
 
         applyFilters() {
@@ -956,94 +1084,96 @@
             });
 
             this.updateKPIs();
-            this.updateCharts();
+            this.updateChartsData();
             this.renderHeatmap();
             this.renderTable();
-            if (this.currentMode === 'idle') IdleDashboard.refreshData();
+            if(this.currentMode === 'idle') IdleDashboard.refreshData();
         },
 
         updateKPIs() {
             document.getElementById('kpi-total').innerText = this.filteredData.length;
-            const counts = {};
-            this.filteredData.forEach(d => counts[d.turno] = (counts[d.turno] || 0) + 1);
-            document.getElementById('kpi-turno').innerText = Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0] || '-';
-            const idle = IdleDashboard.calculateMetric(this.filteredData, "IDLE") || 0;
-            const el = document.getElementById('kpi-idle-valor');
-            el.innerText = idle.toFixed(1) + "%";
-            el.style.color = idle >= 95 ? 'var(--accent-green)' : (idle >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
+            const countTurnos = {};
+            this.filteredData.forEach(d => countTurnos[d.turno] = (countTurnos[d.turno] || 0) + 1);
+            document.getElementById('kpi-turno').innerText = Object.keys(countTurnos).sort((a,b) => countTurnos[b] - countTurnos[a])[0] || '-';
+            
+            const valIdle = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE");
+            const elIdle = document.getElementById('kpi-idle-valor');
+            elIdle.innerText = valIdle.toFixed(1) + "%";
+            elIdle.style.color = valIdle >= 95 ? 'var(--accent-green)' : 'var(--shopee-orange)';
         },
 
         createCharts() {
-            const commonOpt = { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { display: false }, 
-                    datalabels: { display: true, color: '#fff', font: { weight: 'bold', size: 10 } } 
-                },
-                scales: {
-                    x: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', font: { size: 9 } } },
-                    y: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 9 } } }
-                }
-            };
-            
-            this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: commonOpt });
-            this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: commonOpt });
-            
-            this.charts.area = new Chart(document.getElementById('chartArea'), { 
-                type: 'bar', 
-                data: { labels: [], datasets: [{ backgroundColor: '#8957e5', data: [] }] }, 
-                options: { 
-                    ...commonOpt, 
-                    indexAxis: 'y',
-                    scales: {
-                        x: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', font: { size: 9 } } },
-                        y: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 10 } } }
-                    }
-                } 
-            });
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { size: 10, weight: 'bold' } } } };
+            this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: opt });
+            this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: opt });
+            this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#3fb950', data: [] }] }, options: { ...opt, indexAxis: 'y' } });
         },
 
         createIdleCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', formatter: v => v + '%' } }, scales: { y: { min: 0, max: 100 } } };
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } };
             this.idleCharts.cd = new Chart(document.getElementById('chartIdleCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#39c5cf', data: [] }] }, options: opt });
             this.idleCharts.turno = new Chart(document.getElementById('chartIdleTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#d29922', data: [] }] }, options: opt });
         },
 
-        updateCharts() {
-            this.charts.turno.data.labels = this.turnos;
-            this.charts.turno.data.datasets[0].data = this.turnos.map(t => this.filteredData.filter(d => d.turno === t).length);
+        updateChartsData() {
+            // Chart Turno
+            const tLabels = this.turnosEixo;
+            this.charts.turno.data.labels = tLabels;
+            this.charts.turno.data.datasets[0].data = tLabels.map(l => this.filteredData.filter(d => d.turno === l).length);
             this.charts.turno.update();
 
-            this.charts.cd.data.labels = this.cds;
-            this.charts.cd.data.datasets[0].data = this.cds.map(c => this.filteredData.filter(d => d.cd === c).length);
+            // Chart CD
+            const cLabels = this.listaCDsGerais;
+            this.charts.cd.data.labels = cLabels;
+            this.charts.cd.data.datasets[0].data = cLabels.map(l => this.filteredData.filter(d => d.cd === l).length);
             this.charts.cd.update();
 
-            const areas = [...new Set(this.rawData.map(d => d.area))].filter(Boolean).sort();
-            this.charts.area.data.labels = areas;
-            this.charts.area.data.datasets[0].data = areas.map(a => this.filteredData.filter(d => d.area === a).length);
+            // Chart Area
+            const aLabels = [...new Set(this.rawData.map(d => d.area))].sort();
+            this.charts.area.data.labels = aLabels;
+            this.charts.area.data.datasets[0].data = aLabels.map(l => this.filteredData.filter(d => d.area === l).length);
             this.charts.area.update();
+
+            // Sync Idle Charts
+            this.idleCharts.cd.data.labels = cLabels;
+            this.idleCharts.cd.data.datasets[0].data = cLabels.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "IDLE"));
+            this.idleCharts.cd.update();
+
+            this.idleCharts.turno.data.labels = tLabels;
+            this.idleCharts.turno.data.datasets[0].data = tLabels.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "IDLE"));
+            this.idleCharts.turno.update();
         },
 
         renderHeatmap() {
-            const cd = document.getElementById('dropdownHeatmapCD').value;
-            const data = cd === "GERAL" ? this.filteredData : this.filteredData.filter(d => d.cd === cd);
+            const target = document.getElementById('dropdownHeatmapCD').value;
+            const data = target === "GERAL" ? this.filteredData : this.filteredData.filter(d => d.cd === target);
             const matrix = {};
-            this.turnos.forEach(t => { matrix[t] = {}; this.dias.forEach(d => matrix[t][d] = 0); });
-            data.forEach(d => { if(matrix[d.turno]) matrix[d.turno][d.diaSem]++ });
-            let h = `<div class="heatmap-grid"><div></div>` + this.dias.map(d => `<div class="heatmap-header-cell">${d.substring(0,3)}</div>`).join('') + `</div>`;
-            this.turnos.forEach(t => {
-                h += `<div class="heatmap-grid"><div class="heatmap-row-label">${t}</div>` + this.dias.map(d => {
-                    const c = matrix[t][d];
-                    return `<div class="heatmap-cell" style="background:rgba(238, 77, 45, ${Math.min(c/10, 1)})"><span class="count">${c}</span></div>`;
+            const turnos = ["T1", "T2", "T3"];
+            turnos.forEach(t => { matrix[t] = {}; this.diasSemanaEixo.forEach(d => matrix[t][d] = 0); });
+            data.forEach(d => { if(matrix[d.turno]) matrix[d.turno][d.diaSemana]++; });
+
+            let h = `<div class="heatmap-grid"><div></div>` + this.diasSemanaEixo.map(d => `<div class="heatmap-header-cell">${d.substring(0,3)}</div>`).join('') + `</div>`;
+            turnos.forEach(t => {
+                h += `<div class="heatmap-grid"><div class="heatmap-row-label">${t}</div>` + this.diasSemanaEixo.map(d => {
+                    const count = matrix[t][d];
+                    const alpha = Math.min(count / 10, 1);
+                    return `<div class="heatmap-cell" style="background:rgba(238, 77, 45, ${alpha})"><span class="count">${count}</span></div>`;
                 }).join('') + `</div>`;
             });
             document.getElementById('heatmapContainer').innerHTML = h;
         },
 
         renderTable() {
-            document.getElementById('tableBody').innerHTML = this.filteredData.slice(0, 100).map(d => `
-                <tr><td>${d.dataHora}</td><td style="color:var(--accent-blue); font-weight:700;">${d.cd}</td><td style="color:var(--shopee-orange); font-weight:700;">${d.turno}</td><td>${d.responsavel}</td><td>${d.cargo}</td><td>${d.area}</td></tr>
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = this.filteredData.slice(0, 50).map(d => `
+                <tr>
+                    <td>${d.dataHora}</td>
+                    <td>${d.cd}</td>
+                    <td>${d.turno}</td>
+                    <td>${d.responsavel}</td>
+                    <td>${d.cargo}</td>
+                    <td>${d.area}</td>
+                </tr>
             `).join('');
         },
 
@@ -1051,157 +1181,146 @@
             this.currentMode = document.getElementById('analysis-mode').value;
             document.getElementById('section-padrao').classList.toggle('hidden', this.currentMode === 'idle');
             document.getElementById('section-idle').classList.toggle('hidden', this.currentMode === 'padrao');
-            document.getElementById('kpi-dashboard-geral').classList.toggle('hidden', this.currentMode === 'idle');
-            if (this.currentMode === 'idle') IdleDashboard.init();
+            if(this.currentMode === 'idle') IdleDashboard.init();
         }
     };
 
     const IdleDashboard = {
-        cd: '', area: '', ind: '',
+        cdSelected: '',
+        areaSelected: '',
+        indicatorSelected: '',
+        charts: {},
+
         init() {
-            const s = document.getElementById('idle-cd-selector');
-            s.innerHTML = '<option value="">Selecione o CD</option>' + Dashboard.cds.map(c => `<option value="${c}">${c}</option>`).join('');
-            this.renderLevel1(); this.resetToLevel(1);
+            this.buildCdOptions();
+            this.renderLevel1Brasil();
         },
-        refreshData() { this.renderLevel1(); if(this.cd) this.renderLevel2(); if(this.area) this.renderLevel3(); if(this.ind) this.renderLevel4(); },
 
-        calculateMetric(rows, type) {
-            if (!rows || rows.length === 0) return null;
-            let sum = 0, count = 0;
+        buildCdOptions() {
+            const el = document.getElementById('idle-cd-selector');
+            el.innerHTML = '<option value="">Selecione o CD</option>' + Dashboard.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
+        },
+
+        // FUNÇÃO DE CÁLCULO MESTRE - FONTE ÚNICA DA VERDADE
+        calculateRealMetric(rows, metricName) {
+            if (!rows || rows.length === 0) return 0;
+            let sum = 0;
+            let count = 0;
+
             rows.forEach(r => {
-                let v = null; const t = type.toUpperCase();
-                if (t === "IDLE") {
-                    if (r.idle_p && r.idle_p !== "") v = parseFloat(r.idle_p.toString().replace('%','').replace(',','.'));
-                    else if (r.idle_b && r.idle_r) {
-                        const b = parseFloat(r.idle_b.replace(',','.')), re = parseFloat(r.idle_r.replace(',','.'));
-                        if (b > 0) v = (re / b) * 100;
+                let val = null;
+                if (metricName === "IDLE") {
+                    // Regra: IDLE TIME % (col 12) prioritário, senão calculo (col 11 / col 10)
+                    const pct = parseFloat((r.idle_pct || "").toString().replace(',', '.').replace('%', ''));
+                    if (!isNaN(pct)) {
+                        val = pct;
+                    } else {
+                        const plan = parseFloat(r.idle_plan);
+                        const real = parseFloat(r.idle_real);
+                        if (!isNaN(plan) && !isNaN(real) && plan > 0) val = (real / plan) * 100;
                     }
-                } else if (t === "OPA") v = (r.opa.toUpperCase() === "SIM" || r.opa.toUpperCase() === "OK") ? 100 : 0;
-                else if (t === "DDSMA") v = (r.ddsma.toUpperCase() === "SIM" || r.ddsma.toUpperCase() === "OK") ? 100 : 0;
-                else if (t === "DDQA") v = (r.ddqa.toUpperCase() === "SIM" || r.ddqa.toUpperCase() === "OK") ? 100 : 0;
-                if (v !== null && !isNaN(v)) { sum += Math.min(v, 100); count++; }
+                } else {
+                    // DDSMA, DDQA, OPA
+                    const raw = (r[metricName.toLowerCase()] || "").toString().toUpperCase();
+                    if (raw === "SIM" || raw === "REALIZADO" || raw === "OK") val = 100;
+                    else if (raw === "NAO" || raw === "PENDENTE") val = 0;
+                    else {
+                        const num = parseFloat(raw.replace(',', '.').replace('%', ''));
+                        if (!isNaN(num)) val = num;
+                    }
+                }
+
+                if (val !== null) {
+                    sum += Math.min(val, 100); // Teto de 100% para evitar distorções
+                    count++;
+                }
             });
-            return count > 0 ? (sum / count) : 0;
+
+            return count > 0 ? sum / count : 0;
         },
 
-        renderLevel1() {
-            const d = Dashboard.filteredData;
-            this.updateCard('br-idle', this.calculateMetric(d, 'IDLE'), 95);
-            this.updateCard('br-opa', this.calculateMetric(d, 'OPA'), 95);
-            this.updateCard('br-ddsma', this.calculateMetric(d, 'DDSMA'), 95);
-            this.updateCard('br-ddqa', this.calculateMetric(d, 'DDQA'), 95);
-            Dashboard.idleCharts.cd.data.labels = Dashboard.cds;
-            Dashboard.idleCharts.cd.data.datasets[0].data = Dashboard.cds.map(c => (this.calculateMetric(d.filter(x => x.cd === c), 'IDLE') || 0).toFixed(1));
-            Dashboard.idleCharts.cd.update();
-            Dashboard.idleCharts.turno.data.labels = Dashboard.turnos;
-            Dashboard.idleCharts.turno.data.datasets[0].data = Dashboard.turnos.map(t => (this.calculateMetric(d.filter(x => x.turno === t), 'IDLE') || 0).toFixed(1));
-            Dashboard.idleCharts.turno.update();
+        renderLevel1Brasil() {
+            const idle = this.calculateRealMetric(Dashboard.rawData, "IDLE");
+            const opa = this.calculateRealMetric(Dashboard.rawData, "OPA");
+            const ddsma = this.calculateRealMetric(Dashboard.rawData, "DDSMA");
+            const ddqa = this.calculateRealMetric(Dashboard.rawData, "DDQA");
+
+            const update = (id, val, meta) => {
+                const el = document.getElementById(id + '-val');
+                const st = document.getElementById(id + '-status');
+                el.innerText = val.toFixed(1) + "%";
+                el.style.color = val >= meta ? 'var(--accent-green)' : 'var(--shopee-orange)';
+                st.innerText = `Gap: ${(val - meta).toFixed(1)}%`;
+                st.className = `kpi-trend ${val >= meta ? 'trend-up' : 'trend-danger'}`;
+            };
+
+            update('br-idle', idle, 95);
+            update('br-opa', opa, 95);
+            update('br-ddsma', ddsma, 95);
+            update('br-ddqa', ddqa, 95);
         },
 
-        updateCard(id, v, m) {
-            const el = document.getElementById(id + '-val'), st = document.getElementById(id + '-status');
-            if (el) { el.innerText = (v || 0).toFixed(1) + "%"; el.style.color = v >= m ? 'var(--accent-green)' : 'var(--shopee-orange)'; }
-            if (st) { const diff = (v || 0) - m; st.innerText = diff >= 0 ? "OK" : `Gap: ${diff.toFixed(1)}%`; st.className = `kpi-trend ${diff >= 0 ? 'trend-up' : 'trend-danger'}`; }
-        },
-
-        onSelectCD(val) {
-            this.cd = val; this.area = ''; this.ind = ''; if (!val) { this.resetToLevel(1); return; }
-            document.getElementById('cd-display-name').innerText = "Visão CD: " + val;
+        onSelectCD(cd) {
+            this.cdSelected = cd;
+            if(!cd) {
+                document.getElementById('idle-nivel-2').classList.add('hidden');
+                return;
+            }
+            document.getElementById('cd-display-name').innerText = cd;
             document.getElementById('idle-nivel-2').classList.remove('hidden');
-            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))].filter(Boolean).sort();
-            document.getElementById('idle-area-selector').innerHTML = '<option value="">Selecione a Área</option>' + areas.map(a => `<option value="${a}">${a}</option>`).join('');
-            this.renderLevel2(); this.updateBread();
+            
+            const areaSel = document.getElementById('idle-area-selector');
+            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === cd).map(d => d.area))].sort();
+            areaSel.innerHTML = '<option value="">Selecione a Área</option>' + areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            
+            this.renderCdLevel();
         },
 
-        renderLevel2() {
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd);
-            this.updateCard('cd-idle', this.calculateMetric(d, 'IDLE'), 95);
-            this.updateCard('cd-opa', this.calculateMetric(d, 'OPA'), 95);
-            this.updateCard('cd-ddsma', this.calculateMetric(d, 'DDSMA'), 95);
-            this.updateCard('cd-ddqa', this.calculateMetric(d, 'DDQA'), 95);
-            this.renderCdCharts(); this.renderCdHeatmap();
+        renderCdLevel() {
+            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected);
+            const idle = this.calculateRealMetric(rows, "IDLE");
+            document.getElementById('cd-idle-val').innerText = idle.toFixed(1) + "%";
+            document.getElementById('cd-idle-val').style.color = idle >= 95 ? 'var(--accent-green)' : 'var(--shopee-orange)';
         },
 
-        renderCdCharts() {
-            if (this.charts.cdMetaReal) this.charts.cdMetaReal.destroy();
-            const ctx = document.getElementById('chartCdMetaReal').getContext('2d');
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd);
-            const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-            this.charts.cdMetaReal = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: days,
-                    datasets: [{ label: 'Realizado', data: days.map(day => this.calculateMetric(d.filter(x => x.diaSem.includes(day)), 'IDLE')), borderColor: '#00f2fe', tension: 0.4 },
-                               { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5, 5], pointRadius: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#8b949e' } }, datalabels: { display: false } } }
-            });
-        },
-
-        renderCdHeatmap() {
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd);
-            const matrix = {}; const shifts = ["T1", "T2", "T3"];
-            shifts.forEach(s => { matrix[s] = {}; this.dias.forEach(day => matrix[s][day] = this.calculateMetric(d.filter(x => x.turno === s && x.diaSem === day), 'IDLE')); });
-            let h = `<div class="heatmap-grid"><div></div>` + this.dias.map(day => `<div class="heatmap-header-cell">${day.substring(0,3)}</div>`).join('') + `</div>`;
-            shifts.forEach(s => {
-                h += `<div class="heatmap-grid"><div class="heatmap-row-label">${s}</div>` + this.dias.map(day => {
-                    const v = matrix[s][day] || 0;
-                    return `<div class="heatmap-cell" style="background:rgba(57, 197, 207, ${v/100})"><span class="count" style="font-size:9px">${v.toFixed(1)}%</span></div>`;
-                }).join('') + `</div>`;
-            });
-            document.getElementById('cdHeatmapContainer').innerHTML = h;
-        },
-
-        onSelectArea(val) {
-            this.area = val; this.ind = ''; if (!val) { this.resetToLevel(2); return; }
-            document.getElementById('area-display-name').innerText = "Área: " + val;
+        onSelectArea(area) {
+            this.areaSelected = area;
+            if(!area) return;
+            document.getElementById('area-display-name').innerText = area;
             document.getElementById('idle-nivel-3').classList.remove('hidden');
-            const indicators = ["IDLE TIME", "OPA", "DDSMA", "DDQA"];
-            document.getElementById('idle-indicator-selector').innerHTML = '<option value="">Selecione o Indicador</option>' + indicators.map(i => `<option value="${i}">${i}</option>`).join('');
-            this.renderLevel3(); this.updateBread();
+            
+            const indSel = document.getElementById('idle-indicator-selector');
+            const indicators = ["DDSMA", "DDQA", "IDLE", "OPA"];
+            indSel.innerHTML = '<option value="">Selecione o Indicador</option>' + indicators.map(i => `<option value="${i}">${i}</option>`).join('');
+            
+            this.renderAreaLevel();
         },
 
-        renderLevel3() {
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd && x.area === this.area);
-            this.updateCard('area-idle', this.calculateMetric(d, 'IDLE'), 95);
-            this.updateCard('area-opa', this.calculateMetric(d, 'OPA'), 95);
-            this.updateCard('area-ddsma', this.calculateMetric(d, 'DDSMA'), 95);
-            this.updateCard('area-ddqa', this.calculateMetric(d, 'DDQA'), 95);
-            this.renderAreaCharts();
+        renderAreaLevel() {
+            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
+            const idle = this.calculateRealMetric(rows, "IDLE");
+            document.getElementById('area-idle-val').innerText = idle.toFixed(1) + "%";
         },
 
-        renderAreaCharts() {
-            if (this.charts.areaMetaReal) this.charts.areaMetaReal.destroy();
-            const ctx = document.getElementById('chartAreaMetaReal').getContext('2d');
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd && x.area === this.area);
-            this.charts.areaMetaReal = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: ['Realizado', 'Meta'], datasets: [{ data: [this.calculateMetric(d, 'IDLE'), 95], backgroundColor: ['#8957e5', '#30363d'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-        },
-
-        onSelectIndicator(val) {
-            this.ind = val; if (!val) { this.resetToLevel(3); return; }
-            document.getElementById('indicator-display-name').innerText = val;
+        onSelectIndicator(ind) {
+            this.indicatorSelected = ind;
+            if(!ind) return;
+            document.getElementById('indicator-display-name').innerText = ind;
             document.getElementById('idle-nivel-4').classList.remove('hidden');
-            this.renderLevel4(); this.updateBread();
+            this.renderIndicatorLevel();
         },
 
-        renderLevel4() {
-            const d = Dashboard.filteredData.filter(x => x.cd === this.cd && x.area === this.area);
-            const v = this.calculateMetric(d, this.ind === "IDLE TIME" ? "IDLE" : this.ind) || 0;
-            document.getElementById('ind-realizado-val').innerText = v.toFixed(1) + "%";
-            const g = v - 95;
-            document.getElementById('ind-gap-val').innerText = (g >= 0 ? "+" : "") + g.toFixed(1) + "%";
-            document.getElementById('ind-status-val').innerText = g >= 0 ? "DENTRO DA META" : "FORA DA META";
+        renderIndicatorLevel() {
+            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
+            const real = this.calculateRealMetric(rows, this.indicatorSelected);
+            document.getElementById('ind-meta-val').innerText = "95.0%";
+            document.getElementById('ind-realizado-val').innerText = real.toFixed(1) + "%";
         },
 
-        updateBread() { document.getElementById('breadcrumb-content').innerText = `Brasil ${this.cd ? '> ' + this.cd : ''} ${this.area ? '> ' + this.area : ''} ${this.ind ? '> ' + this.ind : ''}`; },
-        resetToLevel(l) { 
-            if(l<=1) { document.getElementById('idle-nivel-2').classList.add('hidden'); this.cd = ''; }
-            if(l<=2) { document.getElementById('idle-nivel-3').classList.add('hidden'); this.area = ''; }
-            if(l<=3) { document.getElementById('idle-nivel-4').classList.add('hidden'); this.ind = ''; }
+        refreshData() {
+            this.renderLevel1Brasil();
+            if(this.cdSelected) this.renderCdLevel();
+            if(this.areaSelected) this.renderAreaLevel();
         }
     };
 
