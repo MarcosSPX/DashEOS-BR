@@ -1,3 +1,5 @@
+--- START OF FILE Paste July 14, 2026 - 5:18PM ---
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -923,6 +925,10 @@
             else if (n.includes("RESPONSAVEL")) headerMap.responsavel = idx;
             else if (n.includes("CARGO")) headerMap.cargo = idx;
             else if (n.includes("AREA ATUACAO")) headerMap.area = idx;
+            else if (n.includes("IDLE TIME %")) headerMap.idlePct = idx;
+            else if (n.includes("OPA")) headerMap.opa = idx;
+            else if (n.includes("DDSMA")) headerMap.ddsma = idx;
+            else if (n.includes("DDQA")) headerMap.ddqa = idx;
             else headerMap[n] = idx;
         });
 
@@ -1043,7 +1049,7 @@
 
         updateKPIs() {
             document.getElementById('kpi-total').innerText = this.filteredData.length;
-            const idle = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE TIME %");
+            const idle = IdleDashboard.calculateRealMetric(this.filteredData, "idlePct");
             const el = document.getElementById('kpi-idle-valor');
             el.innerText = idle.toFixed(1) + "%";
             el.style.color = idle >= 95 ? 'var(--accent-green)' : (idle >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
@@ -1081,11 +1087,11 @@
             this.charts.area.update();
 
             this.idleCharts.cd.data.labels = this.listaCDsGerais;
-            this.idleCharts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "IDLE TIME %"));
+            this.idleCharts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "idlePct"));
             this.idleCharts.cd.update();
 
             this.idleCharts.turno.data.labels = this.turnosEixo;
-            this.idleCharts.turno.data.datasets[0].data = this.turnosEixo.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "IDLE TIME %"));
+            this.idleCharts.turno.data.datasets[0].data = this.turnosEixo.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "idlePct"));
             this.idleCharts.turno.update();
         },
 
@@ -1126,19 +1132,28 @@
     const IdleDashboard = {
         cdSelected: '', areaSelected: '', indicatorSelected: '', charts: {},
 
-        calculateRealMetric(rows, metricName) {
+        calculateRealMetric(rows, metricKey) {
             if (!Array.isArray(rows) || rows.length === 0) return 0;
             let sum = 0, count = 0;
-            const target = metricName.toUpperCase().trim();
             rows.forEach(r => {
-                const val = r[target];
+                const val = r[metricKey];
                 if (val === undefined || val === null || val === "") return;
                 let n = 0;
                 const s = val.toString().toUpperCase().trim();
-                if (["SIM", "OK", "REALIZADO"].includes(s)) n = 100;
-                else if (["NAO", "NÃO", "PENDENTE"].includes(s)) n = 0;
-                else n = parseFloat(s.replace("%", "").replace(",", "."));
-                if (!isNaN(n)) { sum += n; count++; }
+                // Tratamento para Indicadores de Texto (Checkboxes da Planilha)
+                if (["SIM", "OK", "REALIZADO"].includes(s)) {
+                    n = 100;
+                    sum += n;
+                    count++;
+                } else if (["NAO", "NÃO", "PENDENTE"].includes(s)) {
+                    n = 0;
+                    sum += n;
+                    count++;
+                } else {
+                    // Tratamento para Campos Numéricos e Percentuais
+                    n = parseFloat(s.replace("%", "").replace(",", "."));
+                    if (!isNaN(n)) { sum += n; count++; }
+                }
             });
             return count > 0 ? sum / count : 0;
         },
@@ -1158,16 +1173,17 @@
 
         renderLevel1Brasil() {
             const data = Dashboard.rawData;
-            const idle = this.calculateRealMetric(data, "IDLE TIME %");
-            const opa = this.calculateRealMetric(data, "OPA");
-            const ddsma = this.calculateRealMetric(data, "DDSMA");
-            const ddqa = this.calculateRealMetric(data, "DDQA");
+            const idle = this.calculateRealMetric(data, "idlePct");
+            const opa = this.calculateRealMetric(data, "opa");
+            const ddsma = this.calculateRealMetric(data, "ddsma");
+            const ddqa = this.calculateRealMetric(data, "ddqa");
 
             const update = (id, val, meta) => {
                 const el = document.getElementById(id);
                 el.innerText = val.toFixed(1) + "%";
-                el.parentElement.nextElementSibling.querySelector('.kpi-trend').innerText = val >= meta ? "Meta OK" : "Gap: " + (val - meta).toFixed(1) + "%";
-                el.parentElement.nextElementSibling.querySelector('.kpi-trend').className = "kpi-trend " + (val >= meta ? "trend-up" : "trend-danger");
+                const trend = el.parentElement.nextElementSibling.querySelector('.kpi-trend');
+                trend.innerText = val >= meta ? "Meta OK" : "Gap: " + (val - meta).toFixed(1) + "%";
+                trend.className = "kpi-trend " + (val >= meta ? "trend-up" : "trend-danger");
             };
             update('br-idle-val', idle, 95);
             update('br-opa-val', opa, 95);
@@ -1187,10 +1203,10 @@
 
         renderCdLevel() {
             const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected);
-            document.getElementById('cd-idle-val').innerText = this.calculateRealMetric(data, "IDLE TIME %").toFixed(1) + "%";
-            document.getElementById('cd-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
-            document.getElementById('cd-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
-            document.getElementById('cd-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
+            document.getElementById('cd-idle-val').innerText = this.calculateRealMetric(data, "idlePct").toFixed(1) + "%";
+            document.getElementById('cd-opa-val').innerText = this.calculateRealMetric(data, "opa").toFixed(1) + "%";
+            document.getElementById('cd-ddsma-val').innerText = this.calculateRealMetric(data, "ddsma").toFixed(1) + "%";
+            document.getElementById('cd-ddqa-val').innerText = this.calculateRealMetric(data, "ddqa").toFixed(1) + "%";
             this.renderCdCharts();
         },
 
@@ -1198,8 +1214,18 @@
             const ctx = document.getElementById('chartCdMetaReal').getContext('2d');
             if (this.charts.cdLine) this.charts.cdLine.destroy();
             const days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-            const data = days.map(d => this.calculateRealMetric(Dashboard.rawData.filter(r => r.cd === this.cdSelected && r.diaSemana === d), "IDLE TIME %"));
-            this.charts.cdLine = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: 'Real', data: data, borderColor: '#00f2fe', tension: 0.4 }, { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+            const data = days.map(d => this.calculateRealMetric(Dashboard.rawData.filter(r => r.cd === this.cdSelected && r.diaSemana === d), "idlePct"));
+            this.charts.cdLine = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: days, 
+                    datasets: [
+                        { label: 'Real', data: data, borderColor: '#00f2fe', tension: 0.4 }, 
+                        { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }
+                    ] 
+                }, 
+                options: { responsive: true, maintainAspectRatio: false } 
+            });
         },
 
         onSelectArea(area) {
@@ -1207,22 +1233,23 @@
             document.getElementById('area-display-name').innerText = area || "-";
             document.getElementById('idle-nivel-3').classList.toggle('hidden', !area);
             if (!area) return;
-            const inds = ["DDSMA", "DDQA", "IDLE TIME %", "OPA"];
-            document.getElementById('idle-indicator-selector').innerHTML = `<option value="">Selecione</option>` + inds.map(i => `<option value="${i}">${i}</option>`).join('');
+            // Indicadores derivam das colunas mapeadas da planilha
+            const inds = ["ddsma", "ddqa", "idlePct", "opa"];
+            document.getElementById('idle-indicator-selector').innerHTML = `<option value="">Selecione</option>` + inds.map(i => `<option value="${i}">${i.toUpperCase()}</option>`).join('');
             this.renderAreaLevel();
         },
 
         renderAreaLevel() {
             const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            document.getElementById('area-idle-val').innerText = this.calculateRealMetric(data, "IDLE TIME %").toFixed(1) + "%";
-            document.getElementById('area-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
-            document.getElementById('area-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
-            document.getElementById('area-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
+            document.getElementById('area-idle-val').innerText = this.calculateRealMetric(data, "idlePct").toFixed(1) + "%";
+            document.getElementById('area-opa-val').innerText = this.calculateRealMetric(data, "opa").toFixed(1) + "%";
+            document.getElementById('area-ddsma-val').innerText = this.calculateRealMetric(data, "ddsma").toFixed(1) + "%";
+            document.getElementById('area-ddqa-val').innerText = this.calculateRealMetric(data, "ddqa").toFixed(1) + "%";
         },
 
         onSelectIndicator(ind) {
             this.indicatorSelected = ind;
-            document.getElementById('indicator-display-name').innerText = ind || "-";
+            document.getElementById('indicator-display-name').innerText = ind.toUpperCase() || "-";
             document.getElementById('idle-nivel-4').classList.toggle('hidden', !ind);
             if (ind) this.renderIndicatorLevel();
         },
