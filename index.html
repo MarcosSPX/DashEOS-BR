@@ -981,7 +981,7 @@
                 } catch(err) { console.error("Erro data:", err); }
                 
                 // Normalização de CDs para os gráficos (conforme a imagem do dashboard)
-                let cdNorm = item.cd ? item.cd.toString().toUpperCase().trim() : "BRFSP1";
+                let cdNorm = item.cd ? item.cd.toString().toUpperCase().trim() : " ";
                 if (cdNorm.includes("FRANCO 1")) cdNorm = "BRFSP1";
                 if (cdNorm.includes("FRANCO 2")) cdNorm = "BRFSP2";
                 if (cdNorm.includes("JABOATAO")) cdNorm = "BRFPE1";
