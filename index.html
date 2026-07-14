@@ -846,12 +846,13 @@
             <table id="mainTable">
                 <thead>
                     <tr>
+                        <!-- Colunas conforme solicitado -->
                         <th>Data Registro</th>
-                        <th>CD</th>
-                        <th>Turno</th>
+                        <th>CD Operacional</th>
                         <th>Responsável</th>
                         <th>Cargo</th>
-                        <th>Área</th>
+                        <th>Turno</th>
+                        <th>Área Atuação</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -863,26 +864,25 @@
 <script>
     Chart.register(ChartDataLabels);
 
-    const SPREADSHEET_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI'; // <--- INSIRA AQUI A URL DO SEU WEB APP
-    const CACHE_KEY = 'eos_dashboard_cache';
-    const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
-    const MAX_TABLE_RECORDS = 2000;
-
-    // Utilitários de Conversão
+    // ENDPOINT CONFIGURATION
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbycoVam3_qcF0EvFEFwSxklgqS2FyanzIGAXBU26UEeFEfrB7GYx985bjcoRnd09etQ/exec';
+    
+    // UTILITIES FOR DATA PARSING
     const Utils = {
-        parsePercentage(val) {
-            if (!val || val === "") return null;
-            let num = parseFloat(val.toString().replace('%', '').replace(',', '.').trim());
-            return isNaN(num) ? null : num;
+        parsePercent: (val) => {
+            if (!val) return null;
+            let n = parseFloat(val.toString().replace('%', '').replace(',', '.').trim());
+            return isNaN(n) ? null : n;
         },
-        parseNumber(val) {
-            if (!val || val === "") return null;
-            let num = parseFloat(val.toString().replace(',', '.').trim());
-            return isNaN(num) ? null : num;
+        parseNum: (val) => {
+            if (!val) return null;
+            let n = parseFloat(val.toString().replace(',', '.').trim());
+            return isNaN(n) ? null : n;
         },
-        formatDate(dateStr) {
-            if (!dateStr) return "";
-            return dateStr;
+        isOk: (val) => {
+            if (!val) return false;
+            const v = val.toString().toUpperCase().trim();
+            return v === 'SIM' || v === 'OK' || v === 'REALIZADO';
         }
     };
 
@@ -892,7 +892,8 @@
         charts: {},
         idleCharts: {},
         currentMode: 'padrao',
-        
+        extraAreaFilter: '',
+
         mesesMapeados: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
         diasSemanaEixo: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
         
@@ -901,7 +902,7 @@
             document.getElementById('loadingOverlay').style.display = 'flex';
             
             try {
-                const data = await this.fetchData();
+                const data = await this.fetchSpreadsheetData();
                 this.processData(data);
                 this.createCharts();
                 this.createIdleCharts();
@@ -910,81 +911,86 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
                 this.startAutoUpdate();
             } catch (e) {
-                console.error("Erro inicialização:", e);
-                document.getElementById('errorMessage').innerText = "Erro ao carregar dados: " + e.message;
+                console.error("[EOS-BR] Erro:", e);
+                document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('errorOverlay').style.display = 'flex';
+                document.getElementById('errorMessage').innerText = e.message;
             }
         },
 
-        async fetchData() {
+        startClock() {
+            setInterval(() => {
+                const clock = document.getElementById('clock');
+                if(clock) clock.innerText = new Date().toLocaleTimeString('pt-BR');
+            }, 1000);
+        },
+
+        async fetchSpreadsheetData() {
             const response = await fetch(SPREADSHEET_URL);
-            if (!response.ok) throw new Error("Falha na conexão.");
+            if (!response.ok) throw new Error("Erro na rede.");
             const data = await response.json();
-            if (data.error) throw new Error(data.error);
             return data;
         },
 
         processData(data) {
-            this.rawData = data.map(item => {
-                // Cálculo de IDLE seguindo a regra prioritária
-                let idlePerc = Utils.parsePercentage(item["IDLE TIME %"]);
-                if (idlePerc === null) {
-                    let real = Utils.parseNumber(item["IDLE TIME REAL"]);
-                    let total = Utils.parseNumber(item["IDLE TIME"]);
-                    if (real !== null && total !== null && total > 0) {
-                        idlePerc = (real / total) * 100;
+            // Mapping column headers exactly as requested
+            this.rawData = data.map(row => {
+                // IDLE Calculation Logic: Priority IDLE TIME % -> then Calculation -> Else skip
+                let idle = Utils.parsePercent(row['IDLE TIME %']);
+                if (idle === null) {
+                    const real = Utils.parseNum(row['IDLE TIME REAL']);
+                    const total = Utils.parseNum(row['IDLE TIME']);
+                    if (total && total > 0 && real !== null) {
+                        idle = (real / total) * 100;
                     }
                 }
 
-                // Normalização de Datas para Filtros
-                let dParts = item["Data Registro"].split(' ');
-                let dateOnly = dParts[0].split('/');
-                let mesIdx = dateOnly.length === 3 ? parseInt(dateOnly[1]) - 1 : 0;
-                
-                // Cálculo do dia da semana (assumindo formato DD/MM/YYYY)
-                let dayOfWeek = "Segunda";
-                if(dateOnly.length === 3) {
-                    let dObj = new Date(dateOnly[2], dateOnly[1]-1, dateOnly[0]);
-                    let days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-                    dayOfWeek = days[dObj.getDay()];
+                // Parse Date
+                let dObj = new Date();
+                const rawDate = row['Data Registro'];
+                if(rawDate && rawDate.includes('/')) {
+                    const parts = rawDate.split(' ')[0].split('/');
+                    dObj = new Date(parts[2], parts[1]-1, parts[0]);
                 }
 
                 return {
-                    original: item,
-                    dataRegistro: item["Data Registro"],
-                    cd: item["CD Operacional"] || "N/A",
-                    responsavel: item["Responsável"] || "N/A",
-                    cargo: item["Cargo"] || "N/A",
-                    turno: item["Turno"] || "N/A",
-                    area: item["Área Atuação"] || "N/A",
-                    ddsma: (item["DDSMA"] || "").toUpperCase() === "SIM" || (item["DDSMA"] || "").toUpperCase() === "OK",
-                    ddqa: (item["DDQA"] || "").toUpperCase() === "SIM" || (item["DDQA"] || "").toUpperCase() === "OK",
-                    opa: (item["OPA"] || "").toUpperCase() === "SIM" || (item["OPA"] || "").toUpperCase() === "OK",
-                    idleValue: idlePerc, // Pode ser null
-                    mes: this.mesesMapeados[mesIdx],
-                    diaSemana: dayOfWeek
+                    original: row,
+                    timestamp: dObj,
+                    dataStr: row['Data Registro'],
+                    cd: row['CD Operacional'] || 'N/A',
+                    responsavel: row['Responsável'] || 'N/A',
+                    cargo: row['Cargo'] || 'N/A',
+                    turno: row['Turno'] || 'N/A',
+                    area: row['Área Atuação'] || 'N/A',
+                    ddsma: Utils.isOk(row['DDSMA']),
+                    ddqa: Utils.isOk(row['DDQA']),
+                    opa: Utils.isOk(row['OPA']),
+                    idle: idle,
+                    mes: this.mesesMapeados[dObj.getMonth()],
+                    diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay() - 1]
                 };
             });
 
-            this.updateFilterOptions();
+            this.updateDropdowns();
         },
 
-        updateFilterOptions() {
-            const populate = (id, list) => {
+        updateDropdowns() {
+            const getUniq = (key) => [...new Set(this.rawData.map(d => d[key]))].filter(Boolean).sort();
+            
+            const populate = (id, list, label) => {
                 const el = document.getElementById(id);
-                const current = el.value;
-                el.innerHTML = `<option value="">Todos</option>` + [...new Set(list)].sort().map(v => `<option value="${v}">${v}</option>`).join('');
-                el.value = current;
+                el.innerHTML = `<option value="">${label}</option>` + 
+                    list.map(v => `<option value="${v}">${v}</option>`).join('');
             };
 
-            populate('filter-mes', this.rawData.map(d => d.mes));
-            populate('filter-turno', this.rawData.map(d => d.turno));
-            populate('filter-cd', this.rawData.map(d => d.cd));
-            populate('filter-cargo', this.rawData.map(d => d.cargo));
-            
-            // Sync Heatmap CD selector
+            populate('filter-mes', getUniq('mes'), 'Todos os Meses');
+            populate('filter-turno', getUniq('turno'), 'Todos os Turnos');
+            populate('filter-cd', getUniq('cd'), 'Todos os CDs');
+            populate('filter-cargo', getUniq('cargo'), 'Todos os Cargos');
+
             const hmCd = document.getElementById('dropdownHeatmapCD');
-            hmCd.innerHTML = `<option value="GERAL">Visão Geral</option>` + [...new Set(this.rawData.map(d => d.cd))].sort().map(v => `<option value="${v}">${v}</option>`).join('');
+            hmCd.innerHTML = `<option value="GERAL">Visão Geral</option>` + 
+                getUniq('cd').map(v => `<option value="${v}">${v}</option>`).join('');
         },
 
         applyFilters() {
@@ -999,106 +1005,119 @@
                 if (fTurno && d.turno !== fTurno) return false;
                 if (fCd && d.cd !== fCd) return false;
                 if (fCargo && d.cargo !== fCargo) return false;
-                if (fSearch && !d.responsavel.toLowerCase().includes(fSearch) && !d.cd.toLowerCase().includes(fSearch)) return false;
+                if (this.extraAreaFilter && d.area !== this.extraAreaFilter) return false;
+                if (fSearch && !d.responsavel.toLowerCase().includes(fSearch)) return false;
                 return true;
             });
 
-            this.updateAllComponents();
-        },
-
-        updateAllComponents() {
             this.updateKPIs();
             this.updateCharts();
             this.renderHeatmap();
             this.renderTable();
-            if (this.currentMode === 'idle') IdleDashboard.refresh();
+            
+            if (this.currentMode === 'idle') {
+                IdleDashboard.updateFromFilters();
+            }
         },
 
         updateKPIs() {
             document.getElementById('kpi-total').innerText = this.filteredData.length;
             
-            const turnos = this.filteredData.reduce((acc, d) => { acc[d.turno] = (acc[d.turno] || 0) + 1; return acc; }, {});
+            const turnos = this.filteredData.reduce((acc, d) => { acc[d.turno] = (acc[d.turno]||0)+1; return acc; }, {});
             const lider = Object.entries(turnos).sort((a,b) => b[1]-a[1])[0];
-            document.getElementById('kpi-turno').innerText = lider ? lider[0] : "-";
+            document.getElementById('kpi-turno').innerText = lider ? lider[0] : '-';
 
-            const idleValues = this.filteredData.filter(d => d.idleValue !== null).map(d => d.idleValue);
-            const idleMedia = idleValues.length ? (idleValues.reduce((a,b)=>a+b,0)/idleValues.length) : 0;
+            const idleRows = this.filteredData.filter(d => d.idle !== null);
+            const idleBr = idleRows.length ? (idleRows.reduce((a,b)=>a+b.idle,0)/idleRows.length) : 0;
             const idleEl = document.getElementById('kpi-idle-valor');
-            idleEl.innerText = idleMedia.toFixed(1) + "%";
-            idleEl.style.color = idleMedia >= 95 ? 'var(--accent-green)' : (idleMedia >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
+            idleEl.innerText = idleBr.toFixed(1) + '%';
+            idleEl.style.color = idleBr >= 95 ? 'var(--accent-green)' : (idleBr >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
         },
 
         createCharts() {
-            const common = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold', size: 10 }, formatter: Math.round } } };
-            
-            this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: common });
-            this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: common });
-            this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#3fb950', data: [] }] }, options: { ...common, indexAxis: 'y' } });
+            const options = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold' } } }
+            };
+
+            this.charts.turno = new Chart(document.getElementById('chartTurno'), {
+                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options
+            });
+            this.charts.cd = new Chart(document.getElementById('chartCD'), {
+                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options
+            });
+            this.charts.area = new Chart(document.getElementById('chartArea'), {
+                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#3fb950', data: [] }] },
+                options: { ...options, indexAxis: 'y' }
+            });
         },
 
         createIdleCharts() {
-            const common = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', formatter: v => v.toFixed(1) + '%' } }, scales: { y: { min: 0, max: 110 } } };
-            this.idleCharts.cd = new Chart(document.getElementById('chartIdleCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#39c5cf', data: [] }] }, options: common });
-            this.idleCharts.turno = new Chart(document.getElementById('chartIdleTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#d29922', data: [] }] }, options: common });
+            const options = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', formatter: v => v.toFixed(1)+'%' } },
+                scales: { y: { min: 0, max: 105 } }
+            };
+            this.idleCharts.cd = new Chart(document.getElementById('chartIdleCD'), {
+                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#39c5cf', data: [] }] }, options
+            });
+            this.idleCharts.turno = new Chart(document.getElementById('chartIdleTurno'), {
+                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#d29922', data: [] }] }, options
+            });
         },
 
         updateCharts() {
-            const aggregate = (data, key) => data.reduce((acc, d) => { acc[d[key]] = (acc[d[key]] || 0) + 1; return acc; }, {});
-            
-            const dTurno = aggregate(this.filteredData, 'turno');
-            this.charts.turno.data.labels = Object.keys(dTurno);
-            this.charts.turno.data.datasets[0].data = Object.values(dTurno);
+            const agg = (key) => {
+                const count = this.filteredData.reduce((acc, d) => { acc[d[key]] = (acc[d[key]]||0)+1; return acc; }, {});
+                return { labels: Object.keys(count), values: Object.values(count) };
+            };
+
+            const t = agg('turno');
+            this.charts.turno.data.labels = t.labels;
+            this.charts.turno.data.datasets[0].data = t.values;
             this.charts.turno.update();
 
-            const dCd = aggregate(this.filteredData, 'cd');
-            this.charts.cd.data.labels = Object.keys(dCd);
-            this.charts.cd.data.datasets[0].data = Object.values(dCd);
+            const c = agg('cd');
+            this.charts.cd.data.labels = c.labels;
+            this.charts.cd.data.datasets[0].data = c.values;
             this.charts.cd.update();
 
-            const dArea = aggregate(this.filteredData, 'area');
-            this.charts.area.data.labels = Object.keys(dArea);
-            this.charts.area.data.datasets[0].data = Object.values(dArea);
+            const a = agg('area');
+            this.charts.area.data.labels = a.labels;
+            this.charts.area.data.datasets[0].data = a.values;
             this.charts.area.update();
 
-            // Charts Nacionais (Aba IDLE)
-            const cdIdle = this.filteredData.reduce((acc, d) => {
-                if (d.idleValue !== null) {
-                    if (!acc[d.cd]) acc[d.cd] = { sum: 0, count: 0 };
-                    acc[d.cd].sum += d.idleValue;
-                    acc[d.cd].count++;
-                }
-                return acc;
-            }, {});
-            this.idleCharts.cd.data.labels = Object.keys(cdIdle);
-            this.idleCharts.cd.data.datasets[0].data = Object.values(cdIdle).map(v => v.sum / v.count);
+            // National Analytics Charts
+            const cdList = [...new Set(this.rawData.map(d => d.cd))].sort();
+            this.idleCharts.cd.data.labels = cdList;
+            this.idleCharts.cd.data.datasets[0].data = cdList.map(cd => {
+                const rows = this.rawData.filter(d => d.cd === cd && d.idle !== null);
+                return rows.length ? (rows.reduce((a,b)=>a+b.idle,0)/rows.length) : 0;
+            });
             this.idleCharts.cd.update();
 
-            const trIdle = this.filteredData.reduce((acc, d) => {
-                if (d.idleValue !== null) {
-                    if (!acc[d.turno]) acc[d.turno] = { sum: 0, count: 0 };
-                    acc[d.turno].sum += d.idleValue;
-                    acc[d.turno].count++;
-                }
-                return acc;
-            }, {});
-            this.idleCharts.turno.data.labels = Object.keys(trIdle);
-            this.idleCharts.turno.data.datasets[0].data = Object.values(trIdle).map(v => v.sum / v.count);
+            const trList = [...new Set(this.rawData.map(d => d.turno))].sort();
+            this.idleCharts.turno.data.labels = trList;
+            this.idleCharts.turno.data.datasets[0].data = trList.map(tr => {
+                const rows = this.rawData.filter(d => d.turno === tr && d.idle !== null);
+                return rows.length ? (rows.reduce((a,b)=>a+b.idle,0)/rows.length) : 0;
+            });
             this.idleCharts.turno.update();
         },
 
         renderHeatmap() {
-            const targetCd = document.getElementById('dropdownHeatmapCD').value;
-            const data = targetCd === 'GERAL' ? this.filteredData : this.filteredData.filter(d => d.cd === targetCd);
-            
-            const turnos = [...new Set(this.rawData.map(d => d.turno))].sort();
-            const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+            const selCd = document.getElementById('dropdownHeatmapCD').value;
+            const data = selCd === 'GERAL' ? this.filteredData : this.filteredData.filter(d => d.cd === selCd);
             
             const matrix = {};
+            const turnos = [...new Set(this.rawData.map(d => d.turno))].sort();
+            const dias = this.diasSemanaEixo;
+
             turnos.forEach(t => { matrix[t] = {}; dias.forEach(d => matrix[t][d] = { sum: 0, count: 0 }); });
 
             data.forEach(d => {
-                if (d.idleValue !== null && matrix[d.turno]) {
-                    matrix[d.turno][d.diaSemana].sum += d.idleValue;
+                if (d.idle !== null && matrix[d.turno]) {
+                    matrix[d.turno][d.diaSemana].sum += d.idle;
                     matrix[d.turno][d.diaSemana].count++;
                 }
             });
@@ -1110,7 +1129,7 @@
                 dias.forEach(d => {
                     const cell = matrix[t][d];
                     const val = cell.count > 0 ? (cell.sum / cell.count) : 0;
-                    const alpha = val > 0 ? Math.min(val / 100, 1) : 0.05;
+                    const alpha = val > 0 ? (0.1 + (val/100)*0.9) : 0.05;
                     const color = val >= 95 ? `rgba(63, 185, 80, ${alpha})` : (val >= 90 ? `rgba(210, 153, 34, ${alpha})` : `rgba(238, 77, 45, ${alpha})`);
                     html += `<div class="heatmap-cell" style="background:${color}"><span class="count">${val.toFixed(0)}%</span></div>`;
                 });
@@ -1120,15 +1139,16 @@
         },
 
         renderTable() {
+            // Support up to 2000 records
             const tbody = document.getElementById('tableBody');
-            const data = this.filteredData.slice(0, MAX_TABLE_RECORDS);
-            tbody.innerHTML = data.map(d => `
+            const records = this.filteredData.slice(0, 2000);
+            tbody.innerHTML = records.map(d => `
                 <tr>
-                    <td>${d.dataRegistro}</td>
+                    <td>${d.dataStr}</td>
                     <td style="font-weight:700; color:var(--accent-blue)">${d.cd}</td>
-                    <td>${d.turno}</td>
                     <td>${d.responsavel}</td>
                     <td>${d.cargo}</td>
+                    <td>${d.turno}</td>
                     <td>${d.area}</td>
                 </tr>
             `).join('');
@@ -1136,27 +1156,27 @@
 
         toggleAnalysisMode() {
             this.currentMode = document.getElementById('analysis-mode').value;
-            document.getElementById('section-padrao').classList.toggle('hidden', this.currentMode !== 'padrao');
-            document.getElementById('section-idle').classList.toggle('hidden', this.currentMode !== 'idle');
+            document.getElementById('section-padrao').classList.toggle('hidden', this.currentMode === 'idle');
+            document.getElementById('section-idle').classList.toggle('hidden', this.currentMode === 'padrao');
             document.getElementById('kpi-dashboard-geral').classList.toggle('hidden', this.currentMode === 'idle');
-            if(this.currentMode === 'idle') IdleDashboard.init();
-        },
-
-        startClock() {
-            setInterval(() => {
-                document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR');
-            }, 1000);
+            
+            if (this.currentMode === 'idle') {
+                IdleDashboard.init();
+            } else {
+                this.extraAreaFilter = '';
+                this.applyFilters();
+            }
         },
 
         startAutoUpdate() {
-            document.getElementById('sync-status').innerText = "BASE OPERACIONAL ATIVA";
-            document.getElementById('sync-status').className = "kpi-trend trend-up";
+            document.getElementById('sync-status').innerText = 'BASE OPERACIONAL ATIVA';
+            document.getElementById('sync-status').className = 'kpi-trend trend-up';
             setInterval(async () => {
                 try {
-                    const data = await this.fetchData();
+                    const data = await this.fetchSpreadsheetData();
                     this.processData(data);
                     this.applyFilters();
-                } catch(e) { console.warn("Erro auto-update:", e); }
+                } catch(e) { console.warn("Erro no auto-sync:", e); }
             }, 60000);
         }
     };
@@ -1168,147 +1188,220 @@
         charts: {},
 
         init() {
-            this.updateCdSelector();
-            this.refresh();
+            this.updateCdOptions();
+            this.renderLevel1();
         },
 
-        updateCdSelector() {
+        updateCdOptions() {
             const cds = [...new Set(Dashboard.rawData.map(d => d.cd))].sort();
             const sel = document.getElementById('idle-cd-selector');
-            sel.innerHTML = `<option value="">Selecione o CD</option>` + cds.map(c => `<option value="${c}">${c}</option>`).join('');
+            sel.innerHTML = '<option value="">Selecione o CD</option>' + 
+                cds.map(v => `<option value="${v}">${v}</option>`).join('');
         },
 
-        refresh() {
+        updateFromFilters() {
             this.renderLevel1();
             if(this.cdSelected) this.renderLevel2();
             if(this.areaSelected) this.renderLevel3();
             if(this.indicatorSelected) this.renderLevel4();
-            this.updateBreadcrumb();
-        },
-
-        updateBreadcrumb() {
-            let path = `<i class="fas fa-globe" style="color: var(--accent-blue); margin-right: 5px;"></i>Brasil`;
-            if(this.cdSelected) path += ` <i class="fas fa-chevron-right" style="font-size:8px"></i> ${this.cdSelected}`;
-            if(this.areaSelected) path += ` <i class="fas fa-chevron-right" style="font-size:8px"></i> ${this.areaSelected}`;
-            if(this.indicatorSelected) path += ` <i class="fas fa-chevron-right" style="font-size:8px"></i> ${this.indicatorSelected}`;
-            document.getElementById('breadcrumb-content').innerHTML = path;
         },
 
         onSelectCD(val) {
             this.cdSelected = val;
             this.areaSelected = '';
             this.indicatorSelected = '';
-            document.getElementById('idle-nivel-2').classList.toggle('hidden', !val);
+            
             document.getElementById('cd-display-name').innerText = val;
-            
-            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))].sort();
-            const selArea = document.getElementById('idle-area-selector');
-            selArea.innerHTML = `<option value="">Selecione a Área</option>` + areas.map(a => `<option value="${a}">${a}</option>`).join('');
-            
-            this.refresh();
+            document.getElementById('idle-nivel-2').classList.toggle('hidden', !val);
+            document.getElementById('idle-nivel-3').classList.add('hidden');
+            document.getElementById('idle-nivel-4').classList.add('hidden');
+
+            if (val) {
+                const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))].sort();
+                const sel = document.getElementById('idle-area-selector');
+                sel.innerHTML = '<option value="">Selecione a Área</option>' + 
+                    areas.map(v => `<option value="${v}">${v}</option>`).join('');
+                this.renderLevel2();
+            }
+            this.updateBreadcrumb();
         },
 
         onSelectArea(val) {
             this.areaSelected = val;
             this.indicatorSelected = '';
-            document.getElementById('idle-nivel-3').classList.toggle('hidden', !val);
+            
             document.getElementById('area-display-name').innerText = val;
-            
-            const indicators = ["DDSMA", "DDQA", "OPA", "IDLE TIME"];
-            const selInd = document.getElementById('idle-indicator-selector');
-            selInd.innerHTML = `<option value="">Selecione o Indicador</option>` + indicators.map(i => `<option value="${i}">${i}</option>`).join('');
-            
-            this.refresh();
+            document.getElementById('idle-nivel-3').classList.toggle('hidden', !val);
+            document.getElementById('idle-nivel-4').classList.add('hidden');
+
+            if (val) {
+                const inds = ['DDSMA', 'DDQA', 'OPA', 'IDLE TIME'];
+                const sel = document.getElementById('idle-indicator-selector');
+                sel.innerHTML = '<option value="">-- Selecione o Indicador --</option>' + 
+                    inds.map(v => `<option value="${v}">${v}</option>`).join('');
+                this.renderLevel3();
+            }
+            this.updateBreadcrumb();
         },
 
         onSelectIndicator(val) {
             this.indicatorSelected = val;
-            document.getElementById('idle-nivel-4').classList.toggle('hidden', !val);
             document.getElementById('indicator-display-name').innerText = val;
-            this.refresh();
+            document.getElementById('idle-nivel-4').classList.toggle('hidden', !val);
+            if (val) this.renderLevel4();
+            this.updateBreadcrumb();
         },
 
-        calcMedia(data, key) {
-            const vals = data.filter(d => d[key] !== null).map(d => d[key]);
-            return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+        updateBreadcrumb() {
+            let html = `<i class="fas fa-globe" style="color: var(--accent-blue); margin-right: 5px;"></i>Brasil`;
+            if(this.cdSelected) html += ` > ${this.cdSelected}`;
+            if(this.areaSelected) html += ` > ${this.areaSelected}`;
+            if(this.indicatorSelected) html += ` > ${this.indicatorSelected}`;
+            document.getElementById('breadcrumb-content').innerHTML = html;
         },
 
-        calcBoolean(data, key) {
-            const total = data.length;
-            if(!total) return 0;
-            const positive = data.filter(d => d[key]).length;
-            return (positive / total) * 100;
+        calcMedia(rows, type) {
+            if(!rows.length) return 0;
+            if(type === 'idle') {
+                const valid = rows.filter(r => r.idle !== null);
+                return valid.length ? (valid.reduce((a,b)=>a+b.idle,0)/valid.length) : 0;
+            }
+            const positive = rows.filter(r => r[type.toLowerCase()]).length;
+            return (positive / rows.length) * 100;
         },
 
         renderLevel1() {
             const data = Dashboard.filteredData;
-            this.updateKPI('br-idle-val', 'br-idle-status', this.calcMedia(data, 'idleValue'), 95);
-            this.updateKPI('br-opa-val', 'br-opa-status', this.calcBoolean(data, 'opa'), 95);
-            this.updateKPI('br-ddsma-val', 'br-ddsma-status', this.calcBoolean(data, 'ddsma'), 98);
-            this.updateKPI('br-ddqa-val', 'br-ddqa-status', this.calcBoolean(data, 'ddqa'), 96);
+            this.updateKPI('br-idle-val', 'br-idle-status', this.calcMedia(data, 'idle'), 95);
+            this.updateKPI('br-opa-val', 'br-opa-status', this.calcMedia(data, 'opa'), 95);
+            this.updateKPI('br-ddsma-val', 'br-ddsma-status', this.calcMedia(data, 'ddsma'), 98);
+            this.updateKPI('br-ddqa-val', 'br-ddqa-status', this.calcMedia(data, 'ddqa'), 96);
         },
 
         renderLevel2() {
             const data = Dashboard.filteredData.filter(d => d.cd === this.cdSelected);
-            this.updateKPI('cd-idle-val', 'cd-idle-status', this.calcMedia(data, 'idleValue'), 95);
-            this.updateKPI('cd-opa-val', 'cd-opa-status', this.calcBoolean(data, 'opa'), 95);
-            this.updateKPI('cd-ddsma-val', 'cd-ddsma-status', this.calcBoolean(data, 'ddsma'), 98);
-            this.updateKPI('cd-ddqa-val', 'cd-ddqa-status', this.calcBoolean(data, 'ddqa'), 96);
-            this.renderCdCharts(data);
+            this.updateKPI('cd-idle-val', 'cd-idle-status', this.calcMedia(data, 'idle'), 95);
+            this.updateKPI('cd-opa-val', 'cd-opa-status', this.calcMedia(data, 'opa'), 95);
+            this.updateKPI('cd-ddsma-val', 'cd-ddsma-status', this.calcMedia(data, 'ddsma'), 98);
+            this.updateKPI('cd-ddqa-val', 'cd-ddqa-status', this.calcMedia(data, 'ddqa'), 96);
+            this.renderCdLevelCharts(data);
         },
 
         renderLevel3() {
             const data = Dashboard.filteredData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            this.updateKPI('area-idle-val', null, this.calcMedia(data, 'idleValue'), 95);
-            this.updateKPI('area-opa-val', null, this.calcBoolean(data, 'opa'), 95);
-            this.updateKPI('area-ddsma-val', null, this.calcBoolean(data, 'ddsma'), 98);
-            this.updateKPI('area-ddqa-val', null, this.calcBoolean(data, 'ddqa'), 96);
+            this.updateKPI('area-idle-val', null, this.calcMedia(data, 'idle'), 95);
+            this.updateKPI('area-opa-val', null, this.calcMedia(data, 'opa'), 95);
+            this.updateKPI('area-ddsma-val', null, this.calcMedia(data, 'ddsma'), 98);
+            this.updateKPI('area-ddqa-val', null, this.calcMedia(data, 'ddqa'), 96);
+            this.renderAreaLevelCharts(data);
         },
 
         renderLevel4() {
             const data = Dashboard.filteredData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            let val = 0;
-            let meta = 95;
-            if(this.indicatorSelected === 'IDLE TIME') val = this.calcMedia(data, 'idleValue');
-            else if(this.indicatorSelected === 'DDSMA') { val = this.calcBoolean(data, 'ddsma'); meta = 98; }
-            else if(this.indicatorSelected === 'DDQA') { val = this.calcBoolean(data, 'ddqa'); meta = 96; }
-            else if(this.indicatorSelected === 'OPA') val = this.calcBoolean(data, 'opa');
-
-            document.getElementById('ind-meta-val').innerText = meta + "%";
-            document.getElementById('ind-realizado-val').innerText = val.toFixed(1) + "%";
+            const val = this.calcMedia(data, this.indicatorSelected === 'IDLE TIME' ? 'idle' : this.indicatorSelected);
+            const meta = this.indicatorSelected === 'DDSMA' ? 98 : (this.indicatorSelected === 'DDQA' ? 96 : 95);
+            
+            document.getElementById('ind-meta-val').innerText = meta + '%';
+            document.getElementById('ind-realizado-val').innerText = val.toFixed(1) + '%';
+            
             const gap = val - meta;
-            document.getElementById('ind-gap-val').innerText = (gap > 0 ? "+" : "") + gap.toFixed(1) + "%";
-            document.getElementById('ind-status-val').innerText = gap >= 0 ? "DENTRO DA META" : "FORA DA META";
+            const gapEl = document.getElementById('ind-gap-val');
+            gapEl.innerText = (gap > 0 ? '+' : '') + gap.toFixed(1) + '%';
+            gapEl.style.color = gap >= 0 ? 'var(--accent-green)' : 'var(--shopee-orange)';
+            
+            document.getElementById('ind-status-val').innerText = gap >= 0 ? 'DENTRO DA META' : 'FORA DA META';
+            this.renderIndicatorLevelCharts(data, val, meta);
         },
 
         updateKPI(valId, statusId, value, meta) {
-            const el = document.getElementById(valId);
-            if(el) el.innerText = value.toFixed(1) + "%";
+            document.getElementById(valId).innerText = value.toFixed(1) + '%';
             if(statusId) {
-                const sEl = document.getElementById(statusId);
+                const s = document.getElementById(statusId);
                 const gap = value - meta;
-                sEl.innerText = gap >= 0 ? "Meta OK" : `Gap: ${gap.toFixed(1)}%`;
-                sEl.className = "kpi-trend " + (gap >= 0 ? "trend-up" : "trend-danger");
+                s.innerText = gap >= 0 ? 'Meta OK' : `Gap: ${gap.toFixed(1)}%`;
+                s.className = `kpi-trend ${gap >= 0 ? 'trend-up' : 'trend-danger'}`;
             }
         },
 
-        renderCdCharts(data) {
+        renderCdLevelCharts(data) {
             const ctx = document.getElementById('chartCdMetaReal');
             if(this.charts.cdLine) this.charts.cdLine.destroy();
             
-            const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-            const values = dias.map(dia => {
-                const d = data.filter(x => x.diaSemana === dia && x.idleValue !== null);
-                return d.length ? (d.reduce((a,b)=>a+b.idleValue,0)/d.length) : 0;
-            });
+            const days = Dashboard.diasSemanaEixo;
+            const vals = days.map(day => this.calcMedia(data.filter(d => d.diaSemana === day), 'idle'));
 
             this.charts.cdLine = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dias,
+                    labels: days.map(d => d.substring(0,3)),
                     datasets: [
-                        { label: 'Real', data: values, borderColor: '#39c5cf', tension: 0.3 },
+                        { label: 'Realizado', data: vals, borderColor: '#00f2fe', tension: 0.3 },
                         { label: 'Meta', data: new Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            
+            // Heatmap CD
+            const matrix = {};
+            const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].sort();
+            turnos.forEach(t => { matrix[t] = {}; days.forEach(d => matrix[t][d] = { sum: 0, count: 0 }); });
+            data.forEach(d => {
+                if (d.idle !== null && matrix[d.turno]) {
+                    matrix[d.turno][d.diaSemana].sum += d.idle;
+                    matrix[d.turno][d.diaSemana].count++;
+                }
+            });
+            let html = `<div class="heatmap-grid"><div></div>` + days.map(d => `<div class="heatmap-header-cell">${d.substring(0,3)}</div>`).join('') + `</div>`;
+            turnos.forEach(t => {
+                html += `<div class="heatmap-grid"><div class="heatmap-row-label">${t}</div>`;
+                days.forEach(d => {
+                    const c = matrix[t][d];
+                    const v = c.count > 0 ? (c.sum/c.count) : 0;
+                    const color = v >= 95 ? 'rgba(63, 185, 80, 0.5)' : (v >= 90 ? 'rgba(210, 153, 34, 0.5)' : 'rgba(238, 77, 45, 0.5)');
+                    html += `<div class="heatmap-cell" style="background:${color}"><span class="count" style="font-size:10px">${v.toFixed(0)}%</span></div>`;
+                });
+                html += `</div>`;
+            });
+            document.getElementById('cdHeatmapContainer').innerHTML = html;
+        },
+
+        renderAreaLevelCharts(data) {
+            const ctx1 = document.getElementById('chartAreaMetaReal');
+            if(this.charts.areaBar) this.charts.areaBar.destroy();
+            this.charts.areaBar = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Realizado', 'Meta'],
+                    datasets: [{ data: [this.calcMedia(data, 'idle'), 95], backgroundColor: ['#00f2fe', '#ee4d2d'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctx2 = document.getElementById('chartAreaTurnos');
+            if(this.charts.areaTurnos) this.charts.areaTurnos.destroy();
+            const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].sort();
+            const vals = turnos.map(t => this.calcMedia(data.filter(d => d.turno === t), 'idle'));
+            this.charts.areaTurnos = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: turnos, datasets: [{ data: vals, backgroundColor: '#3fb950' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        },
+
+        renderIndicatorLevelCharts(data, val, meta) {
+            const days = Dashboard.diasSemanaEixo;
+            const indKey = this.indicatorSelected === 'IDLE TIME' ? 'idle' : this.indicatorSelected;
+            
+            const ctx = document.getElementById('chartIndDaily');
+            if(this.charts.indDaily) this.charts.indDaily.destroy();
+            this.charts.indDaily = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: days.map(d => d.substring(0,3)),
+                    datasets: [
+                        { label: 'Real', data: days.map(d => this.calcMedia(data.filter(x => x.diaSemana === d), indKey)), borderColor: '#00f2fe' },
+                        { label: 'Meta', data: new Array(7).fill(meta), borderColor: '#ee4d2d', borderDash: [5,5] }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
