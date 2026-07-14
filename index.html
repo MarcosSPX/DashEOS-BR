@@ -865,7 +865,7 @@
     Chart.register(ChartDataLabels);
 
     // Link do Web App do Google Apps Script atualizado conforme solicitado
-    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1wTNxkSsq3RAdzJ7n8NLFvwLHvR-_T6SnunsCXRopGcY/edit?gid=0#gid=0';
+    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1wTNxkSsq3RAdzJ7n8NLFvwLHvR-_T6SnunsCXRopGcY/export?format=csv&gid=0';
     const CACHE_KEY = 'eos_dashboard_cache';
     const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
     const CACHE_DURATION = 30 * 1000; 
@@ -950,14 +950,16 @@
             const cols = parseLine(lines[i]);
             if (cols.length < 2) continue;
 
-            parsedRows.push({
+            const entry = {
                 dataHora: cols[headerMap.dataHora] || "",
                 cd: cols[headerMap.cd] || "",
                 turno: cols[headerMap.turno] || "",
                 responsavel: cols[headerMap.responsavel] || "",
                 cargo: cols[headerMap.cargo] || "",
                 area: cols[headerMap.area] || ""
-            });
+            };
+            headers.forEach((h, idx) => { entry[h] = cols[idx]; });
+            parsedRows.push(entry);
         }
         return parsedRows;
     }
@@ -1068,15 +1070,17 @@
             this.rawData = data.map(item => {
                 let dObj = new Date();
                 try {
-                    const parts = item.dataHora.split(' ')[0].split('/');
-                    dObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                    if (item.dataHora && item.dataHora.includes('/')) {
+                        const parts = item.dataHora.split(' ')[0].split('/');
+                        dObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                    }
                 } catch(err) {
-                    // Fallback de parseamento
+                    dObj = new Date();
                 }
                 
                 let cdNorm = item.cd ? item.cd.toUpperCase().trim() : "";
                 // Validador de segurança contra injeção de strings de erro
-                if (cdNorm.includes(",") || cdNorm.length > 15 || cdNorm.includes("HTTP")) {
+                if (cdNorm.includes(",") || cdNorm.length > 25 || cdNorm.includes("HTTP")) {
                     return null;
                 }
                 if(cdNorm.includes("JABOATAO")) cdNorm = "BRFPE1";
@@ -1110,10 +1114,10 @@
                     dataObj: dObj,
                     cd: cdNorm,
                     area: areaNorm,
-                    mes: this.mesesMapeados[dObj.getMonth()] || "Desconhecido",
+                    mes: this.mesesMapeados[dObj.getMonth()] || "Janeiro",
                     diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay() - 1] || "Segunda"
                 };
-            }).filter(Boolean); // Limpa linhas corrompidas
+            }).filter(d => d !== null); // Limpa linhas corrompidas
 
             this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(Boolean).sort();
             this.turnosEixo = [...new Set(this.rawData.map(d => d.turno))].filter(Boolean).sort();
@@ -1511,10 +1515,10 @@
                 rows.forEach(r => {
                     if (!r) return;
                     Object.keys(r).forEach(key => {
-                        const normKey = (key || "").toString().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        const targetMetric = (metricName || "").toString().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        const normKey = (key || "").toString().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        const targetMetric = (metricName || "").toString().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                         
-                        if (normKey.includes(targetMetric)) {
+                        if (normKey === targetMetric) {
                             const rawVal = r[key];
                             if (rawVal !== null && rawVal !== undefined) {
                                 const val = rawVal.toString().toUpperCase().trim();
@@ -1523,13 +1527,10 @@
                                     total++;
                                 } else if (val === "NAO" || val === "NAO REALIZADO" || val === "PENDENTE" || val === "NAO OK" || val === "0%" || val === "0") {
                                     total++;
-                                } else {
-                                    // Se for campo de porcentagem real (ex: IDLE TIME Meta/Real)
+                                } else if (!isNaN(parseFloat(val.replace("%", "").trim()))) {
                                     const num = parseFloat(val.replace("%", "").trim());
-                                    if (!isNaN(num)) {
-                                        success += num;
-                                        total += 100;
-                                    }
+                                    success += num;
+                                    total += 100;
                                 }
                             }
                         }
@@ -2255,6 +2256,19 @@
             });
             hSupervisores += `</div>`;
             document.getElementById('indSupervisorHeatmapContainer').innerHTML = hSupervisores;
+        },
+
+        setKpiText(id, text, color) {
+            const el = document.getElementById(id);
+            if (el) { el.innerText = text; el.style.color = color; }
+        },
+
+        setTrendBadge(id, val, meta) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const diff = val - meta;
+            if (diff >= 0) { el.innerText = 'Meta OK'; el.className = 'kpi-trend trend-up'; }
+            else { el.innerText = `Gap: ${diff.toFixed(1)}%`; el.className = 'kpi-trend trend-danger'; }
         }
     };
 
