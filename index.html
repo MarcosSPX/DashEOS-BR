@@ -870,12 +870,14 @@
     // UTILITIES FOR DATA PARSING
     const Utils = {
         parsePercent: (val) => {
-            if (!val) return null;
-            let n = parseFloat(val.toString().replace('%', '').replace(',', '.').trim());
+            if (val === null || val === undefined || val === '') return null;
+            // Limpa caracteres comuns de percentual e converte separador decimal
+            let s = val.toString().replace('%', '').replace(',', '.').trim();
+            let n = parseFloat(s);
             return isNaN(n) ? null : n;
         },
         parseNum: (val) => {
-            if (!val) return null;
+            if (val === null || val === undefined || val === '') return null;
             let n = parseFloat(val.toString().replace(',', '.').trim());
             return isNaN(n) ? null : n;
         },
@@ -903,6 +905,11 @@
             
             try {
                 const data = await this.fetchSpreadsheetData();
+                // Verificação de segurança: data deve ser um array
+                if (!Array.isArray(data)) {
+                    throw new Error("A base de dados não retornou uma lista válida. Verifique as permissões do Web App.");
+                }
+                
                 this.processData(data);
                 this.createCharts();
                 this.createIdleCharts();
@@ -911,10 +918,10 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
                 this.startAutoUpdate();
             } catch (e) {
-                console.error("[EOS-BR] Erro:", e);
+                console.error("[EOS-BR] Erro crítico:", e);
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('errorOverlay').style.display = 'flex';
-                document.getElementById('errorMessage').innerText = e.message;
+                document.getElementById('errorMessage').innerText = e.message || "Erro na conexão com a planilha.";
             }
         },
 
@@ -927,15 +934,17 @@
 
         async fetchSpreadsheetData() {
             const response = await fetch(SPREADSHEET_URL);
-            if (!response.ok) throw new Error("Erro na rede.");
+            if (!response.ok) throw new Error("Falha na comunicação HTTP com a planilha.");
             const data = await response.json();
             return data;
         },
 
         processData(data) {
-            // Mapping column headers exactly as requested
-            this.rawData = data.map(row => {
-                // IDLE Calculation Logic: Priority IDLE TIME % -> then Calculation -> Else skip
+            // Suporte para até 2000 registros
+            const limit = data.slice(0, 2000);
+            
+            this.rawData = limit.map(row => {
+                // IDLE Calculation Logic: Priority IDLE TIME % -> then Calculation -> Else null
                 let idle = Utils.parsePercent(row['IDLE TIME %']);
                 if (idle === null) {
                     const real = Utils.parseNum(row['IDLE TIME REAL']);
@@ -945,11 +954,12 @@
                     }
                 }
 
-                // Parse Date
+                // Parse Date format (Expected: DD/MM/YYYY)
                 let dObj = new Date();
                 const rawDate = row['Data Registro'];
                 if(rawDate && rawDate.includes('/')) {
                     const parts = rawDate.split(' ')[0].split('/');
+                    // Mês em JS é 0-11
                     dObj = new Date(parts[2], parts[1]-1, parts[0]);
                 }
 
@@ -975,12 +985,15 @@
         },
 
         updateDropdowns() {
-            const getUniq = (key) => [...new Set(this.rawData.map(d => d[key]))].filter(Boolean).sort();
+            const getUniq = (key) => [...new Set(this.rawData.map(d => d[key]))].filter(v => v && v !== 'N/A').sort();
             
             const populate = (id, list, label) => {
                 const el = document.getElementById(id);
+                if(!el) return;
+                const current = el.value;
                 el.innerHTML = `<option value="">${label}</option>` + 
                     list.map(v => `<option value="${v}">${v}</option>`).join('');
+                el.value = current;
             };
 
             populate('filter-mes', getUniq('mes'), 'Todos os Meses');
@@ -989,8 +1002,12 @@
             populate('filter-cargo', getUniq('cargo'), 'Todos os Cargos');
 
             const hmCd = document.getElementById('dropdownHeatmapCD');
-            hmCd.innerHTML = `<option value="GERAL">Visão Geral</option>` + 
-                getUniq('cd').map(v => `<option value="${v}">${v}</option>`).join('');
+            if(hmCd) {
+                const current = hmCd.value;
+                hmCd.innerHTML = `<option value="GERAL">Visão Geral</option>` + 
+                    getUniq('cd').map(v => `<option value="${v}">${v}</option>`).join('');
+                hmCd.value = current || 'GERAL';
+            }
         },
 
         applyFilters() {
@@ -1006,7 +1023,7 @@
                 if (fCd && d.cd !== fCd) return false;
                 if (fCargo && d.cargo !== fCargo) return false;
                 if (this.extraAreaFilter && d.area !== this.extraAreaFilter) return false;
-                if (fSearch && !d.responsavel.toLowerCase().includes(fSearch)) return false;
+                if (fSearch && !d.responsavel.toLowerCase().includes(fSearch) && !d.cd.toLowerCase().includes(fSearch)) return false;
                 return true;
             });
 
@@ -1021,23 +1038,29 @@
         },
 
         updateKPIs() {
-            document.getElementById('kpi-total').innerText = this.filteredData.length;
+            const totalEl = document.getElementById('kpi-total');
+            if(totalEl) totalEl.innerText = this.filteredData.length;
             
-            const turnos = this.filteredData.reduce((acc, d) => { acc[d.turno] = (acc[d.turno]||0)+1; return acc; }, {});
-            const lider = Object.entries(turnos).sort((a,b) => b[1]-a[1])[0];
-            document.getElementById('kpi-turno').innerText = lider ? lider[0] : '-';
+            const turnoEl = document.getElementById('kpi-turno');
+            if(turnoEl) {
+                const turnos = this.filteredData.reduce((acc, d) => { acc[d.turno] = (acc[d.turno]||0)+1; return acc; }, {});
+                const lider = Object.entries(turnos).sort((a,b) => b[1]-a[1])[0];
+                turnoEl.innerText = lider ? lider[0] : '-';
+            }
 
-            const idleRows = this.filteredData.filter(d => d.idle !== null);
-            const idleBr = idleRows.length ? (idleRows.reduce((a,b)=>a+b.idle,0)/idleRows.length) : 0;
             const idleEl = document.getElementById('kpi-idle-valor');
-            idleEl.innerText = idleBr.toFixed(1) + '%';
-            idleEl.style.color = idleBr >= 95 ? 'var(--accent-green)' : (idleBr >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
+            if(idleEl) {
+                const idleRows = this.filteredData.filter(d => d.idle !== null);
+                const idleBr = idleRows.length ? (idleRows.reduce((a,b)=>a+b.idle,0)/idleRows.length) : 0;
+                idleEl.innerText = idleBr.toFixed(1) + '%';
+                idleEl.style.color = idleBr >= 95 ? 'var(--accent-green)' : (idleBr >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
+            }
         },
 
         createCharts() {
             const options = {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold' } } }
+                plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold' }, formatter: Math.round } }
             };
 
             this.charts.turno = new Chart(document.getElementById('chartTurno'), {
@@ -1067,28 +1090,28 @@
         },
 
         updateCharts() {
-            const agg = (key) => {
+            const aggCount = (key) => {
                 const count = this.filteredData.reduce((acc, d) => { acc[d[key]] = (acc[d[key]]||0)+1; return acc; }, {});
                 return { labels: Object.keys(count), values: Object.values(count) };
             };
 
-            const t = agg('turno');
+            const t = aggCount('turno');
             this.charts.turno.data.labels = t.labels;
             this.charts.turno.data.datasets[0].data = t.values;
             this.charts.turno.update();
 
-            const c = agg('cd');
+            const c = aggCount('cd');
             this.charts.cd.data.labels = c.labels;
             this.charts.cd.data.datasets[0].data = c.values;
             this.charts.cd.update();
 
-            const a = agg('area');
+            const a = aggCount('area');
             this.charts.area.data.labels = a.labels;
             this.charts.area.data.datasets[0].data = a.values;
             this.charts.area.update();
 
-            // National Analytics Charts
-            const cdList = [...new Set(this.rawData.map(d => d.cd))].sort();
+            // National Analytics Charts (Aba IDLE)
+            const cdList = [...new Set(this.rawData.map(d => d.cd))].filter(v => v !== 'N/A').sort();
             this.idleCharts.cd.data.labels = cdList;
             this.idleCharts.cd.data.datasets[0].data = cdList.map(cd => {
                 const rows = this.rawData.filter(d => d.cd === cd && d.idle !== null);
@@ -1096,7 +1119,7 @@
             });
             this.idleCharts.cd.update();
 
-            const trList = [...new Set(this.rawData.map(d => d.turno))].sort();
+            const trList = [...new Set(this.rawData.map(d => d.turno))].filter(v => v !== 'N/A').sort();
             this.idleCharts.turno.data.labels = trList;
             this.idleCharts.turno.data.datasets[0].data = trList.map(tr => {
                 const rows = this.rawData.filter(d => d.turno === tr && d.idle !== null);
@@ -1106,11 +1129,14 @@
         },
 
         renderHeatmap() {
+            const hmContainer = document.getElementById('heatmapContainer');
+            if(!hmContainer) return;
+
             const selCd = document.getElementById('dropdownHeatmapCD').value;
             const data = selCd === 'GERAL' ? this.filteredData : this.filteredData.filter(d => d.cd === selCd);
             
             const matrix = {};
-            const turnos = [...new Set(this.rawData.map(d => d.turno))].sort();
+            const turnos = [...new Set(this.rawData.map(d => d.turno))].filter(v => v !== 'N/A').sort();
             const dias = this.diasSemanaEixo;
 
             turnos.forEach(t => { matrix[t] = {}; dias.forEach(d => matrix[t][d] = { sum: 0, count: 0 }); });
@@ -1129,18 +1155,19 @@
                 dias.forEach(d => {
                     const cell = matrix[t][d];
                     const val = cell.count > 0 ? (cell.sum / cell.count) : 0;
-                    const alpha = val > 0 ? (0.1 + (val/100)*0.9) : 0.05;
+                    const alpha = val > 0 ? (0.2 + (val/100)*0.8) : 0.05;
                     const color = val >= 95 ? `rgba(63, 185, 80, ${alpha})` : (val >= 90 ? `rgba(210, 153, 34, ${alpha})` : `rgba(238, 77, 45, ${alpha})`);
                     html += `<div class="heatmap-cell" style="background:${color}"><span class="count">${val.toFixed(0)}%</span></div>`;
                 });
                 html += `</div>`;
             });
-            document.getElementById('heatmapContainer').innerHTML = html;
+            hmContainer.innerHTML = html;
         },
 
         renderTable() {
-            // Support up to 2000 records
             const tbody = document.getElementById('tableBody');
+            if(!tbody) return;
+            // Support up to 2000 records
             const records = this.filteredData.slice(0, 2000);
             tbody.innerHTML = records.map(d => `
                 <tr>
@@ -1169,14 +1196,19 @@
         },
 
         startAutoUpdate() {
-            document.getElementById('sync-status').innerText = 'BASE OPERACIONAL ATIVA';
-            document.getElementById('sync-status').className = 'kpi-trend trend-up';
+            const statusEl = document.getElementById('sync-status');
+            if(statusEl) {
+                statusEl.innerText = 'BASE OPERACIONAL ATIVA';
+                statusEl.className = 'kpi-trend trend-up';
+            }
             setInterval(async () => {
                 try {
                     const data = await this.fetchSpreadsheetData();
-                    this.processData(data);
-                    this.applyFilters();
-                } catch(e) { console.warn("Erro no auto-sync:", e); }
+                    if(Array.isArray(data)) {
+                        this.processData(data);
+                        this.applyFilters();
+                    }
+                } catch(e) { console.warn("[EOS-BR] Erro no auto-sync:", e); }
             }, 60000);
         }
     };
@@ -1193,8 +1225,9 @@
         },
 
         updateCdOptions() {
-            const cds = [...new Set(Dashboard.rawData.map(d => d.cd))].sort();
+            const cds = [...new Set(Dashboard.rawData.map(d => d.cd))].filter(v => v && v !== 'N/A').sort();
             const sel = document.getElementById('idle-cd-selector');
+            if(!sel) return;
             sel.innerHTML = '<option value="">Selecione o CD</option>' + 
                 cds.map(v => `<option value="${v}">${v}</option>`).join('');
         },
@@ -1211,16 +1244,20 @@
             this.areaSelected = '';
             this.indicatorSelected = '';
             
-            document.getElementById('cd-display-name').innerText = val;
+            const display = document.getElementById('cd-display-name');
+            if(display) display.innerText = val;
+            
             document.getElementById('idle-nivel-2').classList.toggle('hidden', !val);
             document.getElementById('idle-nivel-3').classList.add('hidden');
             document.getElementById('idle-nivel-4').classList.add('hidden');
 
             if (val) {
-                const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))].sort();
+                const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))].filter(v => v && v !== 'N/A').sort();
                 const sel = document.getElementById('idle-area-selector');
-                sel.innerHTML = '<option value="">Selecione a Área</option>' + 
-                    areas.map(v => `<option value="${v}">${v}</option>`).join('');
+                if(sel) {
+                    sel.innerHTML = '<option value="">Selecione a Área</option>' + 
+                        areas.map(v => `<option value="${v}">${v}</option>`).join('');
+                }
                 this.renderLevel2();
             }
             this.updateBreadcrumb();
@@ -1230,15 +1267,19 @@
             this.areaSelected = val;
             this.indicatorSelected = '';
             
-            document.getElementById('area-display-name').innerText = val;
+            const display = document.getElementById('area-display-name');
+            if(display) display.innerText = val;
+            
             document.getElementById('idle-nivel-3').classList.toggle('hidden', !val);
             document.getElementById('idle-nivel-4').classList.add('hidden');
 
             if (val) {
                 const inds = ['DDSMA', 'DDQA', 'OPA', 'IDLE TIME'];
                 const sel = document.getElementById('idle-indicator-selector');
-                sel.innerHTML = '<option value="">-- Selecione o Indicador --</option>' + 
-                    inds.map(v => `<option value="${v}">${v}</option>`).join('');
+                if(sel) {
+                    sel.innerHTML = '<option value="">-- Selecione o Indicador --</option>' + 
+                        inds.map(v => `<option value="${v}">${v}</option>`).join('');
+                }
                 this.renderLevel3();
             }
             this.updateBreadcrumb();
@@ -1246,7 +1287,9 @@
 
         onSelectIndicator(val) {
             this.indicatorSelected = val;
-            document.getElementById('indicator-display-name').innerText = val;
+            const display = document.getElementById('indicator-display-name');
+            if(display) display.innerText = val;
+            
             document.getElementById('idle-nivel-4').classList.toggle('hidden', !val);
             if (val) this.renderLevel4();
             this.updateBreadcrumb();
@@ -1314,17 +1357,21 @@
         },
 
         updateKPI(valId, statusId, value, meta) {
-            document.getElementById(valId).innerText = value.toFixed(1) + '%';
+            const valEl = document.getElementById(valId);
+            if(valEl) valEl.innerText = value.toFixed(1) + '%';
             if(statusId) {
                 const s = document.getElementById(statusId);
-                const gap = value - meta;
-                s.innerText = gap >= 0 ? 'Meta OK' : `Gap: ${gap.toFixed(1)}%`;
-                s.className = `kpi-trend ${gap >= 0 ? 'trend-up' : 'trend-danger'}`;
+                if(s) {
+                    const gap = value - meta;
+                    s.innerText = gap >= 0 ? 'Meta OK' : `Gap: ${gap.toFixed(1)}%`;
+                    s.className = `kpi-trend ${gap >= 0 ? 'trend-up' : 'trend-danger'}`;
+                }
             }
         },
 
         renderCdLevelCharts(data) {
             const ctx = document.getElementById('chartCdMetaReal');
+            if(!ctx) return;
             if(this.charts.cdLine) this.charts.cdLine.destroy();
             
             const days = Dashboard.diasSemanaEixo;
@@ -1343,8 +1390,11 @@
             });
             
             // Heatmap CD
+            const hmContainer = document.getElementById('cdHeatmapContainer');
+            if(!hmContainer) return;
+            
             const matrix = {};
-            const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].sort();
+            const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].filter(v => v !== 'N/A').sort();
             turnos.forEach(t => { matrix[t] = {}; days.forEach(d => matrix[t][d] = { sum: 0, count: 0 }); });
             data.forEach(d => {
                 if (d.idle !== null && matrix[d.turno]) {
@@ -1363,30 +1413,34 @@
                 });
                 html += `</div>`;
             });
-            document.getElementById('cdHeatmapContainer').innerHTML = html;
+            hmContainer.innerHTML = html;
         },
 
         renderAreaLevelCharts(data) {
             const ctx1 = document.getElementById('chartAreaMetaReal');
-            if(this.charts.areaBar) this.charts.areaBar.destroy();
-            this.charts.areaBar = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: ['Realizado', 'Meta'],
-                    datasets: [{ data: [this.calcMedia(data, 'idle'), 95], backgroundColor: ['#00f2fe', '#ee4d2d'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            if(ctx1) {
+                if(this.charts.areaBar) this.charts.areaBar.destroy();
+                this.charts.areaBar = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Realizado', 'Meta'],
+                        datasets: [{ data: [this.calcMedia(data, 'idle'), 95], backgroundColor: ['#00f2fe', '#ee4d2d'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
 
             const ctx2 = document.getElementById('chartAreaTurnos');
-            if(this.charts.areaTurnos) this.charts.areaTurnos.destroy();
-            const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].sort();
-            const vals = turnos.map(t => this.calcMedia(data.filter(d => d.turno === t), 'idle'));
-            this.charts.areaTurnos = new Chart(ctx2, {
-                type: 'bar',
-                data: { labels: turnos, datasets: [{ data: vals, backgroundColor: '#3fb950' }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            if(ctx2) {
+                if(this.charts.areaTurnos) this.charts.areaTurnos.destroy();
+                const turnos = [...new Set(Dashboard.rawData.map(d => d.turno))].filter(v => v !== 'N/A').sort();
+                const vals = turnos.map(t => this.calcMedia(data.filter(d => d.turno === t), 'idle'));
+                this.charts.areaTurnos = new Chart(ctx2, {
+                    type: 'bar',
+                    data: { labels: turnos, datasets: [{ data: vals, backgroundColor: '#3fb950' }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
         },
 
         renderIndicatorLevelCharts(data, val, meta) {
@@ -1394,6 +1448,7 @@
             const indKey = this.indicatorSelected === 'IDLE TIME' ? 'idle' : this.indicatorSelected;
             
             const ctx = document.getElementById('chartIndDaily');
+            if(!ctx) return;
             if(this.charts.indDaily) this.charts.indDaily.destroy();
             this.charts.indDaily = new Chart(ctx, {
                 type: 'line',
