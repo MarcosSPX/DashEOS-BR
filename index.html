@@ -848,11 +848,11 @@
                     <tr>
                         <!-- Colunas reordenadas e renomeadas exatamente conforme solicitado -->
                         <th>Data Registro</th>
-                        <th>CD Operacional</th>
+                        <th>CD</th>
                         <th>Turno</th>
-                        <th>Responsável</th>
+                        <th>Nome Responsável</th>
                         <th>Cargo</th>
-                        <th>Área Atuação</th>
+                        <th>Área</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -864,11 +864,11 @@
 <script>
     Chart.register(ChartDataLabels);
 
-    // Link do Web App do Google Apps Script
     const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbycoVam3_qcF0EvFEFwSxklgqS2FyanzIGAXBU26UEeFEfrB7GYx985bjcoRnd09etQ/exec';
     const CACHE_KEY = 'eos_dashboard_cache';
     const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
-    
+    const CACHE_DURATION = 30 * 1000; 
+
     function showToast(msg, persist = false) {
         const toast = document.getElementById('toastNotification');
         const toastMsg = document.getElementById('toastMessage');
@@ -893,12 +893,11 @@
         document.getElementById('errorOverlay').style.display = 'none';
     }
 
-    // Leitor de CSV com Mapeamento Estrito da Estrutura Oficial
     function parseCSV(text) {
-        const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+        const lines = text.split(/\r?\n/);
         if (lines.length === 0) return [];
-
-        const separator = (lines[0].match(/;/g) || []).length > (lines[0].match(/,/g) || []).length ? ';' : ',';
+        const firstLine = lines[0];
+        const separator = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
 
         const parseLine = (line) => {
             const result = [];
@@ -907,82 +906,54 @@
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 if (char === '"') inQuotes = !inQuotes;
-                else if (char === separator && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else current += char;
+                else if (char === separator && !inQuotes) { result.push(current.trim()); current = ''; }
+                else current += char;
             }
             result.push(current.trim());
             return result.map(val => val.replace(/^"|"$/g, '').trim());
         };
 
-        const parsedRows = [];
-        // Ignora o cabeçalho e processa baseado na ordem fixa da planilha
-        for (let i = 1; i < lines.length; i++) {
-            const cols = parseLine(lines[i]);
-            if (cols.length < 6) continue;
+        const headers = parseLine(lines[0]);
+        const headerMap = {};
+        headers.forEach((h, idx) => {
+            const n = h.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            if (n.includes("DATA REGISTRO")) headerMap.dataHora = idx;
+            else if (n.includes("CD OPERACIONAL")) headerMap.cd = idx;
+            else if (n.includes("TURNO")) headerMap.turno = idx;
+            else if (n.includes("RESPONSAVEL")) headerMap.responsavel = idx;
+            else if (n.includes("CARGO")) headerMap.cargo = idx;
+            else if (n.includes("AREA ATUACAO")) headerMap.area = idx;
+            else headerMap[n] = idx;
+        });
 
-            parsedRows.push({
-                dataHora: cols[0] || "",
-                cd: cols[1] || "",
-                responsavel: cols[2] || "",
-                cargo: cols[3] || "",
-                turno: cols[4] || "",
-                area: cols[5] || "",
-                ddsma: cols[6] || "",
-                ddsma_just: cols[7] || "",
-                ddqa: cols[8] || "",
-                ddqa_just: cols[9] || "",
-                idle_plan: cols[10] || "",
-                idle_real: cols[11] || "",
-                idle_pct: cols[12] || "",
-                opa: cols[13] || "",
-                opa_just: cols[14] || ""
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const cols = parseLine(lines[i]);
+            const obj = {};
+            Object.keys(headerMap).forEach(key => {
+                obj[key] = cols[headerMap[key]] || "";
             });
+            data.push(obj);
         }
-        return parsedRows;
+        return data;
     }
 
     async function fetchSpreadsheetData() {
         try {
             const response = await fetch(SPREADSHEET_URL);
-            if (!response.ok) throw new Error("Falha na conexão HTTP.");
-            
-            const contentType = response.headers.get("content-type") || "";
-            let rawData = [];
-            
-            if (contentType.includes("json")) {
-                const json = await response.json();
-                const rows = Array.isArray(json) ? json : (json.data || []);
-                rawData = rows.map(item => ({
-                    dataHora: item["Data Registro"] || item.dataHora || "",
-                    cd: item["CD Operacional"] || item.cd || "",
-                    responsavel: item["Responsável"] || item.responsavel || "",
-                    cargo: item["Cargo"] || item.cargo || "",
-                    turno: item["Turno"] || item.turno || "",
-                    area: item["Área Atuação"] || item.area || "",
-                    ddsma: item["DDSMA"] || "",
-                    ddqa: item["DDQA"] || "",
-                    idle_plan: item["IDLE TIME"] || "",
-                    idle_real: item["IDLE TIME REAL"] || "",
-                    idle_pct: item["IDLE TIME %"] || "",
-                    opa: item["OPA"] || ""
-                }));
-            } else {
-                const text = await response.text();
-                if (text.includes("<!DOCTYPE html>")) throw new Error("Acesso negado ao script.");
-                rawData = parseCSV(text);
-            }
-            
-            if (rawData.length === 0) throw new Error("Base de dados vazia.");
-            localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
+            if (!response.ok) throw new Error("Erro HTTP");
+            const text = await response.text();
+            if (text.trim().startsWith("<")) throw new Error("Erro Script Google");
+            const data = parseCSV(text);
+            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+            localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
             document.getElementById('sync-status').innerText = "BASE OPERACIONAL ATIVA";
             document.getElementById('sync-status').className = "kpi-trend trend-up";
-            return rawData;
+            return data;
         } catch (e) {
-            console.error(e);
-            const cache = localStorage.getItem(CACHE_KEY);
-            if (cache) return JSON.parse(cache);
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) return JSON.parse(cached);
             throw e;
         }
     }
@@ -994,15 +965,14 @@
         idleCharts: {},
         currentMode: 'padrao',
         extraAreaFilter: '',
-
         mesesMapeados: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
         diasSemanaEixo: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
         listaCDsGerais: [],
         turnosEixo: [],
 
         async init() {
-            this.startClock();
             document.getElementById('loadingOverlay').style.display = 'flex';
+            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR'), 1000);
             try {
                 const data = await fetchSpreadsheetData();
                 this.processSpreadsheetData(data);
@@ -1010,76 +980,57 @@
                 this.createIdleCharts();
                 this.applyFilters();
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (e) {
-                showErrorOverlay(e.message);
-            }
-        },
-
-        startClock() {
-            setInterval(() => {
-                const el = document.getElementById('clock');
-                if(el) el.innerText = new Date().toLocaleTimeString('pt-BR');
-            }, 1000);
+            } catch (e) { showErrorOverlay(e.message); }
         },
 
         processSpreadsheetData(data) {
+            if (!Array.isArray(data)) data = [];
             this.rawData = data.map(item => {
-                // Validação e Conversão de Data
-                let dObj = new Date();
-                try {
-                    const cleanDate = item.dataHora.split(' ')[0];
-                    const parts = cleanDate.split('/');
-                    if(parts.length === 3) dObj = new Date(parts[2], parts[1]-1, parts[0]);
-                } catch(e) {}
-
-                // Normalização de Textos
-                const normalize = (val) => (val || "").toString().trim().toUpperCase();
-                
+                const parts = (item.dataHora || "").split(' ')[0].split('/');
+                const dObj = parts.length === 3 ? new Date(parts[2], parts[1]-1, parts[0]) : new Date();
+                const cd = (item.cd || "").toUpperCase().trim();
                 return {
                     ...item,
                     dataObj: dObj,
-                    cd: normalize(item.cd),
-                    area: normalize(item.area),
-                    turno: normalize(item.turno),
-                    mes: this.mesesMapeados[dObj.getMonth()] || "Desconhecido",
-                    diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay() - 1]
+                    cd: cd,
+                    area: (item.area || "").toUpperCase().trim(),
+                    mes: this.mesesMapeados[dObj.getMonth()] || "Janeiro",
+                    diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay()-1] || "Segunda"
                 };
-            }).filter(d => d.cd !== "" && d.dataHora !== "" && !d.dataHora.includes("%"));
-
-            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].sort();
-            this.turnosEixo = [...new Set(this.rawData.map(d => d.turno))].sort();
-            this.buildDropdownOptions();
+            });
+            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(Boolean).sort();
+            this.turnosEixo = [...new Set(this.rawData.map(d => d.turno))].filter(Boolean).sort();
+            this.buildDropdowns();
         },
 
-        buildDropdownOptions() {
-            const injetar = (id, lista, label) => {
+        buildDropdowns() {
+            const inject = (id, list) => {
                 const el = document.getElementById(id);
-                if(!el) return;
-                el.innerHTML = `<option value="">${label}</option>` + lista.map(i => `<option value="${i}">${i}</option>`).join('');
+                const current = el.value;
+                el.innerHTML = `<option value="">Todos</option>` + list.map(v => `<option value="${v}">${v}</option>`).join('');
+                el.value = current;
             };
-            injetar('filter-mes', [...new Set(this.rawData.map(d => d.mes))], 'Todos os Meses');
-            injetar('filter-turno', this.turnosEixo, 'Todos os Turnos');
-            injetar('filter-cd', this.listaCDsGerais, 'Todos os CDs');
-            injetar('filter-cargo', [...new Set(this.rawData.map(d => d.cargo))].sort(), 'Todos os Cargos');
-            
-            const dropHeat = document.getElementById('dropdownHeatmapCD');
-            if(dropHeat) dropHeat.innerHTML = '<option value="GERAL">Visão Geral</option>' + this.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
+            inject('filter-mes', this.mesesMapeados);
+            inject('filter-turno', this.turnosEixo);
+            inject('filter-cd', this.listaCDsGerais);
+            inject('filter-cargo', [...new Set(this.rawData.map(d => d.cargo))].filter(Boolean).sort());
+            document.getElementById('dropdownHeatmapCD').innerHTML = `<option value="GERAL">Visão Geral</option>` + this.listaCDsGerais.map(v => `<option value="${v}">${v}</option>`).join('');
         },
 
         applyFilters() {
-            const fMes = document.getElementById('filter-mes').value;
-            const fTurno = document.getElementById('filter-turno').value;
-            const fCd = document.getElementById('filter-cd').value;
-            const fCargo = document.getElementById('filter-cargo').value;
-            const fSearch = document.getElementById('tableSearch').value.toLowerCase();
+            const fM = document.getElementById('filter-mes').value;
+            const fT = document.getElementById('filter-turno').value;
+            const fC = document.getElementById('filter-cd').value;
+            const fCa = document.getElementById('filter-cargo').value;
+            const fS = document.getElementById('tableSearch').value.toLowerCase();
 
             this.filteredData = this.rawData.filter(d => {
-                if (fMes && d.mes !== fMes) return false;
-                if (fTurno && d.turno !== fTurno) return false;
-                if (fCd && d.cd !== fCd) return false;
-                if (fCargo && d.cargo !== fCargo) return false;
+                if (fM && d.mes !== fM) return false;
+                if (fT && d.turno !== fT) return false;
+                if (fC && d.cd !== fC) return false;
+                if (fCa && d.cargo !== fCa) return false;
                 if (this.extraAreaFilter && d.area !== this.extraAreaFilter) return false;
-                if (fSearch && !d.responsavel.toLowerCase().includes(fSearch)) return false;
+                if (fS && !d.responsavel.toLowerCase().includes(fS)) return false;
                 return true;
             });
 
@@ -1087,26 +1038,26 @@
             this.updateChartsData();
             this.renderHeatmap();
             this.renderTable();
-            if(this.currentMode === 'idle') IdleDashboard.refreshData();
+            if (this.currentMode === 'idle') IdleDashboard.refreshData();
         },
 
         updateKPIs() {
             document.getElementById('kpi-total').innerText = this.filteredData.length;
-            const countTurnos = {};
-            this.filteredData.forEach(d => countTurnos[d.turno] = (countTurnos[d.turno] || 0) + 1);
-            document.getElementById('kpi-turno').innerText = Object.keys(countTurnos).sort((a,b) => countTurnos[b] - countTurnos[a])[0] || '-';
+            const idle = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE TIME %");
+            const el = document.getElementById('kpi-idle-valor');
+            el.innerText = idle.toFixed(1) + "%";
+            el.style.color = idle >= 95 ? 'var(--accent-green)' : (idle >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
             
-            const valIdle = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE");
-            const elIdle = document.getElementById('kpi-idle-valor');
-            elIdle.innerText = valIdle.toFixed(1) + "%";
-            elIdle.style.color = valIdle >= 95 ? 'var(--accent-green)' : 'var(--shopee-orange)';
+            const turnos = {};
+            this.filteredData.forEach(d => turnos[d.turno] = (turnos[d.turno] || 0) + 1);
+            document.getElementById('kpi-turno').innerText = Object.keys(turnos).sort((a,b) => turnos[b]-turnos[a])[0] || "-";
         },
 
         createCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { size: 10, weight: 'bold' } } } };
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold', size: 9 } } } };
             this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: opt });
             this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: opt });
-            this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#3fb950', data: [] }] }, options: { ...opt, indexAxis: 'y' } });
+            this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#8957e5', data: [] }] }, options: { ...opt, indexAxis: 'y' } });
         },
 
         createIdleCharts() {
@@ -1116,31 +1067,25 @@
         },
 
         updateChartsData() {
-            // Chart Turno
-            const tLabels = this.turnosEixo;
-            this.charts.turno.data.labels = tLabels;
-            this.charts.turno.data.datasets[0].data = tLabels.map(l => this.filteredData.filter(d => d.turno === l).length);
+            this.charts.turno.data.labels = this.turnosEixo;
+            this.charts.turno.data.datasets[0].data = this.turnosEixo.map(t => this.filteredData.filter(d => d.turno === t).length);
             this.charts.turno.update();
 
-            // Chart CD
-            const cLabels = this.listaCDsGerais;
-            this.charts.cd.data.labels = cLabels;
-            this.charts.cd.data.datasets[0].data = cLabels.map(l => this.filteredData.filter(d => d.cd === l).length);
+            this.charts.cd.data.labels = this.listaCDsGerais;
+            this.charts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => this.filteredData.filter(d => d.cd === c).length);
             this.charts.cd.update();
 
-            // Chart Area
-            const aLabels = [...new Set(this.rawData.map(d => d.area))].sort();
-            this.charts.area.data.labels = aLabels;
-            this.charts.area.data.datasets[0].data = aLabels.map(l => this.filteredData.filter(d => d.area === l).length);
+            const areas = [...new Set(this.rawData.map(d => d.area))].filter(Boolean).sort();
+            this.charts.area.data.labels = areas;
+            this.charts.area.data.datasets[0].data = areas.map(a => this.filteredData.filter(d => d.area === a).length);
             this.charts.area.update();
 
-            // Sync Idle Charts
-            this.idleCharts.cd.data.labels = cLabels;
-            this.idleCharts.cd.data.datasets[0].data = cLabels.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "IDLE"));
+            this.idleCharts.cd.data.labels = this.listaCDsGerais;
+            this.idleCharts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "IDLE TIME %"));
             this.idleCharts.cd.update();
 
-            this.idleCharts.turno.data.labels = tLabels;
-            this.idleCharts.turno.data.datasets[0].data = tLabels.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "IDLE"));
+            this.idleCharts.turno.data.labels = this.turnosEixo;
+            this.idleCharts.turno.data.datasets[0].data = this.turnosEixo.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "IDLE TIME %"));
             this.idleCharts.turno.update();
         },
 
@@ -1155,25 +1100,17 @@
             let h = `<div class="heatmap-grid"><div></div>` + this.diasSemanaEixo.map(d => `<div class="heatmap-header-cell">${d.substring(0,3)}</div>`).join('') + `</div>`;
             turnos.forEach(t => {
                 h += `<div class="heatmap-grid"><div class="heatmap-row-label">${t}</div>` + this.diasSemanaEixo.map(d => {
-                    const count = matrix[t][d];
-                    const alpha = Math.min(count / 10, 1);
-                    return `<div class="heatmap-cell" style="background:rgba(238, 77, 45, ${alpha})"><span class="count">${count}</span></div>`;
+                    const c = matrix[t][d];
+                    const a = c > 0 ? Math.min(c/10, 0.9) : 0.05;
+                    return `<div class="heatmap-cell" style="background:rgba(238,77,45,${a})"><span class="count">${c}</span></div>`;
                 }).join('') + `</div>`;
             });
             document.getElementById('heatmapContainer').innerHTML = h;
         },
 
         renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = this.filteredData.slice(0, 50).map(d => `
-                <tr>
-                    <td>${d.dataHora}</td>
-                    <td>${d.cd}</td>
-                    <td>${d.turno}</td>
-                    <td>${d.responsavel}</td>
-                    <td>${d.cargo}</td>
-                    <td>${d.area}</td>
-                </tr>
+            document.getElementById('tableBody').innerHTML = this.filteredData.slice(0, 100).map(d => `
+                <tr><td>${d.dataHora}</td><td>${d.cd}</td><td>${d.turno}</td><td>${d.responsavel}</td><td>${d.cargo}</td><td>${d.area}</td></tr>
             `).join('');
         },
 
@@ -1181,146 +1118,125 @@
             this.currentMode = document.getElementById('analysis-mode').value;
             document.getElementById('section-padrao').classList.toggle('hidden', this.currentMode === 'idle');
             document.getElementById('section-idle').classList.toggle('hidden', this.currentMode === 'padrao');
-            if(this.currentMode === 'idle') IdleDashboard.init();
+            document.getElementById('kpi-dashboard-geral').classList.toggle('hidden', this.currentMode === 'idle');
+            if (this.currentMode === 'idle') IdleDashboard.init();
         }
     };
 
     const IdleDashboard = {
-        cdSelected: '',
-        areaSelected: '',
-        indicatorSelected: '',
-        charts: {},
+        cdSelected: '', areaSelected: '', indicatorSelected: '', charts: {},
 
-        init() {
-            this.buildCdOptions();
-            this.renderLevel1Brasil();
-        },
-
-        buildCdOptions() {
-            const el = document.getElementById('idle-cd-selector');
-            el.innerHTML = '<option value="">Selecione o CD</option>' + Dashboard.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
-        },
-
-        // FUNÇÃO DE CÁLCULO MESTRE - FONTE ÚNICA DA VERDADE
         calculateRealMetric(rows, metricName) {
-            if (!rows || rows.length === 0) return 0;
-            let sum = 0;
-            let count = 0;
-
+            if (!Array.isArray(rows) || rows.length === 0) return 0;
+            let sum = 0, count = 0;
+            const target = metricName.toUpperCase().trim();
             rows.forEach(r => {
-                let val = null;
-                if (metricName === "IDLE") {
-                    // Regra: IDLE TIME % (col 12) prioritário, senão calculo (col 11 / col 10)
-                    const pct = parseFloat((r.idle_pct || "").toString().replace(',', '.').replace('%', ''));
-                    if (!isNaN(pct)) {
-                        val = pct;
-                    } else {
-                        const plan = parseFloat(r.idle_plan);
-                        const real = parseFloat(r.idle_real);
-                        if (!isNaN(plan) && !isNaN(real) && plan > 0) val = (real / plan) * 100;
-                    }
-                } else {
-                    // DDSMA, DDQA, OPA
-                    const raw = (r[metricName.toLowerCase()] || "").toString().toUpperCase();
-                    if (raw === "SIM" || raw === "REALIZADO" || raw === "OK") val = 100;
-                    else if (raw === "NAO" || raw === "PENDENTE") val = 0;
-                    else {
-                        const num = parseFloat(raw.replace(',', '.').replace('%', ''));
-                        if (!isNaN(num)) val = num;
-                    }
-                }
-
-                if (val !== null) {
-                    sum += Math.min(val, 100); // Teto de 100% para evitar distorções
-                    count++;
-                }
+                const val = r[target];
+                if (val === undefined || val === null || val === "") return;
+                let n = 0;
+                const s = val.toString().toUpperCase().trim();
+                if (["SIM", "OK", "REALIZADO"].includes(s)) n = 100;
+                else if (["NAO", "NÃO", "PENDENTE"].includes(s)) n = 0;
+                else n = parseFloat(s.replace("%", "").replace(",", "."));
+                if (!isNaN(n)) { sum += n; count++; }
             });
-
             return count > 0 ? sum / count : 0;
         },
 
-        renderLevel1Brasil() {
-            const idle = this.calculateRealMetric(Dashboard.rawData, "IDLE");
-            const opa = this.calculateRealMetric(Dashboard.rawData, "OPA");
-            const ddsma = this.calculateRealMetric(Dashboard.rawData, "DDSMA");
-            const ddqa = this.calculateRealMetric(Dashboard.rawData, "DDQA");
-
-            const update = (id, val, meta) => {
-                const el = document.getElementById(id + '-val');
-                const st = document.getElementById(id + '-status');
-                el.innerText = val.toFixed(1) + "%";
-                el.style.color = val >= meta ? 'var(--accent-green)' : 'var(--shopee-orange)';
-                st.innerText = `Gap: ${(val - meta).toFixed(1)}%`;
-                st.className = `kpi-trend ${val >= meta ? 'trend-up' : 'trend-danger'}`;
-            };
-
-            update('br-idle', idle, 95);
-            update('br-opa', opa, 95);
-            update('br-ddsma', ddsma, 95);
-            update('br-ddqa', ddqa, 95);
-        },
-
-        onSelectCD(cd) {
-            this.cdSelected = cd;
-            if(!cd) {
-                document.getElementById('idle-nivel-2').classList.add('hidden');
-                return;
-            }
-            document.getElementById('cd-display-name').innerText = cd;
-            document.getElementById('idle-nivel-2').classList.remove('hidden');
-            
-            const areaSel = document.getElementById('idle-area-selector');
-            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === cd).map(d => d.area))].sort();
-            areaSel.innerHTML = '<option value="">Selecione a Área</option>' + areas.map(a => `<option value="${a}">${a}</option>`).join('');
-            
-            this.renderCdLevel();
-        },
-
-        renderCdLevel() {
-            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected);
-            const idle = this.calculateRealMetric(rows, "IDLE");
-            document.getElementById('cd-idle-val').innerText = idle.toFixed(1) + "%";
-            document.getElementById('cd-idle-val').style.color = idle >= 95 ? 'var(--accent-green)' : 'var(--shopee-orange)';
-        },
-
-        onSelectArea(area) {
-            this.areaSelected = area;
-            if(!area) return;
-            document.getElementById('area-display-name').innerText = area;
-            document.getElementById('idle-nivel-3').classList.remove('hidden');
-            
-            const indSel = document.getElementById('idle-indicator-selector');
-            const indicators = ["DDSMA", "DDQA", "IDLE", "OPA"];
-            indSel.innerHTML = '<option value="">Selecione o Indicador</option>' + indicators.map(i => `<option value="${i}">${i}</option>`).join('');
-            
-            this.renderAreaLevel();
-        },
-
-        renderAreaLevel() {
-            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            const idle = this.calculateRealMetric(rows, "IDLE");
-            document.getElementById('area-idle-val').innerText = idle.toFixed(1) + "%";
-        },
-
-        onSelectIndicator(ind) {
-            this.indicatorSelected = ind;
-            if(!ind) return;
-            document.getElementById('indicator-display-name').innerText = ind;
-            document.getElementById('idle-nivel-4').classList.remove('hidden');
-            this.renderIndicatorLevel();
-        },
-
-        renderIndicatorLevel() {
-            const rows = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            const real = this.calculateRealMetric(rows, this.indicatorSelected);
-            document.getElementById('ind-meta-val').innerText = "95.0%";
-            document.getElementById('ind-realizado-val').innerText = real.toFixed(1) + "%";
+        init() {
+            this.refreshData();
+            const sel = document.getElementById('idle-cd-selector');
+            sel.innerHTML = `<option value="">Selecione o CD</option>` + Dashboard.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
         },
 
         refreshData() {
             this.renderLevel1Brasil();
-            if(this.cdSelected) this.renderCdLevel();
-            if(this.areaSelected) this.renderAreaLevel();
+            if (this.cdSelected) this.renderCdLevel();
+            if (this.areaSelected) this.renderAreaLevel();
+            if (this.indicatorSelected) this.renderIndicatorLevel();
+        },
+
+        renderLevel1Brasil() {
+            const data = Dashboard.rawData;
+            const idle = this.calculateRealMetric(data, "IDLE TIME %");
+            const opa = this.calculateRealMetric(data, "OPA");
+            const ddsma = this.calculateRealMetric(data, "DDSMA");
+            const ddqa = this.calculateRealMetric(data, "DDQA");
+
+            const update = (id, val, meta) => {
+                const el = document.getElementById(id);
+                el.innerText = val.toFixed(1) + "%";
+                el.parentElement.nextElementSibling.querySelector('.kpi-trend').innerText = val >= meta ? "Meta OK" : "Gap: " + (val - meta).toFixed(1) + "%";
+                el.parentElement.nextElementSibling.querySelector('.kpi-trend').className = "kpi-trend " + (val >= meta ? "trend-up" : "trend-danger");
+            };
+            update('br-idle-val', idle, 95);
+            update('br-opa-val', opa, 95);
+            update('br-ddsma-val', ddsma, 95);
+            update('br-ddqa-val', ddqa, 95);
+        },
+
+        onSelectCD(cd) {
+            this.cdSelected = cd; this.areaSelected = ''; this.indicatorSelected = '';
+            document.getElementById('cd-display-name').innerText = cd || "-";
+            document.getElementById('idle-nivel-2').classList.toggle('hidden', !cd);
+            if (!cd) return;
+            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === cd).map(d => d.area))].filter(Boolean).sort();
+            document.getElementById('idle-area-selector').innerHTML = `<option value="">Selecione</option>` + areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            this.renderCdLevel();
+        },
+
+        renderCdLevel() {
+            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected);
+            document.getElementById('cd-idle-val').innerText = this.calculateRealMetric(data, "IDLE TIME %").toFixed(1) + "%";
+            document.getElementById('cd-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
+            document.getElementById('cd-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
+            document.getElementById('cd-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
+            this.renderCdCharts();
+        },
+
+        renderCdCharts() {
+            const ctx = document.getElementById('chartCdMetaReal').getContext('2d');
+            if (this.charts.cdLine) this.charts.cdLine.destroy();
+            const days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+            const data = days.map(d => this.calculateRealMetric(Dashboard.rawData.filter(r => r.cd === this.cdSelected && r.diaSemana === d), "IDLE TIME %"));
+            this.charts.cdLine = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: 'Real', data: data, borderColor: '#00f2fe', tension: 0.4 }, { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        },
+
+        onSelectArea(area) {
+            this.areaSelected = area; this.indicatorSelected = '';
+            document.getElementById('area-display-name').innerText = area || "-";
+            document.getElementById('idle-nivel-3').classList.toggle('hidden', !area);
+            if (!area) return;
+            const inds = ["DDSMA", "DDQA", "IDLE TIME %", "OPA"];
+            document.getElementById('idle-indicator-selector').innerHTML = `<option value="">Selecione</option>` + inds.map(i => `<option value="${i}">${i}</option>`).join('');
+            this.renderAreaLevel();
+        },
+
+        renderAreaLevel() {
+            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
+            document.getElementById('area-idle-val').innerText = this.calculateRealMetric(data, "IDLE TIME %").toFixed(1) + "%";
+            document.getElementById('area-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
+            document.getElementById('area-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
+            document.getElementById('area-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
+        },
+
+        onSelectIndicator(ind) {
+            this.indicatorSelected = ind;
+            document.getElementById('indicator-display-name').innerText = ind || "-";
+            document.getElementById('idle-nivel-4').classList.toggle('hidden', !ind);
+            if (ind) this.renderIndicatorLevel();
+        },
+
+        renderIndicatorLevel() {
+            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
+            const val = this.calculateRealMetric(data, this.indicatorSelected);
+            document.getElementById('ind-meta-val').innerText = "95.0%";
+            document.getElementById('ind-realizado-val').innerText = val.toFixed(1) + "%";
+            const gap = val - 95;
+            const gEl = document.getElementById('ind-gap-val');
+            gEl.innerText = (gap >= 0 ? "+" : "") + gap.toFixed(1) + "%";
+            gEl.style.color = gap >= 0 ? 'var(--accent-green)' : 'var(--shopee-orange)';
+            document.getElementById('ind-status-val').innerText = gap >= 0 ? "DENTRO DA META" : "FORA DA META";
         }
     };
 
