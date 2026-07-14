@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA EOS-BR | DASHBOARD OPERACIONAL</title>
+    <title>SISTEMA EOS-BR | DASHBOARD ANALÍTICO SUPREMO</title>
 
-    <!-- Fontes e Ícones Profissionais -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Chart.js para Alta Performance -->
+    <!-- Bibliotecas de Visualização -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
     <style>
+        /* ==========================================================================
+           1. VARIÁVEIS E DESIGN SYSTEM (SHOPEE STYLE)
+           ========================================================================== */
         :root {
-            --bg: #05070a;
-            --card: #0d1117;
-            --input: #161b22;
+            --bg-deep: #05070a;
+            --bg-card: #0d1117;
+            --bg-input: #161b22;
             --primary: #ee4d2d;
             --primary-glow: rgba(238, 77, 45, 0.15);
             --border: #30363d;
-            --text: #f0f6fc;
+            --text-main: #f0f6fc;
             --text-dim: #8b949e;
             
             --blue: #2f81f7;
@@ -30,219 +33,373 @@
             --yellow: #d29922;
             --cyan: #39c5cf;
             
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
             --header-h: 60px;
+            --radius: 12px;
+            --gap: 15px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* ==========================================================================
+           2. RESET E SCROLLBAR
+           ========================================================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-main);
             font-size: 13px;
             line-height: 1.5;
             overflow-x: hidden;
         }
 
-        /* Layout Grid Principal */
-        .app-container {
-            display: grid;
-            grid-template-areas: 
-                "header"
-                "filters"
-                "kpis"
-                "charts"
-                "heatmap"
-                "table";
-            gap: 15px;
-            padding: 0 25px 25px 25px;
-            max-width: 1800px;
-            margin: 0 auto;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* Componentes */
+        .hidden { display: none !important; }
+
+        /* ==========================================================================
+           3. LAYOUT E CABEÇALHO
+           ========================================================================== */
         header {
-            grid-area: header;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
             height: var(--header-h);
+            padding: 0 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .filters-area {
-            grid-area: filters;
-            background: var(--card);
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .logo-box {
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 16px;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .header-title { font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary); }
+
+        .header-tools { display: flex; align-items: center; gap: 25px; }
+        .clock { font-family: var(--font-mono); color: var(--primary); font-size: 14px; font-weight: 600; }
+        
+        .status-pill {
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--green);
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 1px solid rgba(63, 185, 80, 0.2);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .status-pill::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* ==========================================================================
+           4. FILTROS E NAVEGAÇÃO
+           ========================================================================== */
+        .dashboard-main { padding: var(--gap) 30px; display: flex; flex-direction: column; gap: var(--gap); }
+
+        .filter-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border-radius: var(--radius);
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: 220px repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
+            align-items: center;
         }
 
-        .kpi-grid {
-            grid-area: kpis;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .charts-grid {
-            grid-area: charts;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .section-heatmap { grid-area: heatmap; }
-        .section-table { grid-area: table; }
-
-        /* Estilização Cards */
-        .card {
-            background: var(--card);
+        select {
+            background: var(--bg-input);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.2s ease;
-        }
-
-        .kpi-card { display: flex; justify-content: space-between; align-items: center; }
-        .kpi-data span { font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
-        .kpi-data h2 { font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
-
-        .icon-box {
-            width: 45px; height: 45px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--input); font-size: 18px; border: 1px solid var(--border);
-        }
-
-        /* Tabela */
-        .table-wrapper {
-            max-height: 500px;
-            overflow-y: auto;
+            color: var(--text-main);
+            height: 40px;
+            padding: 0 15px;
             border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        select:hover { border-color: var(--primary); }
+        .select-mode { background: linear-gradient(135deg, var(--primary), #ff8c00) !important; color: white !important; font-weight: 800 !important; border: none !important; }
+
+        /* ==========================================================================
+           5. CARDS DE INDICADORES (KPIs)
+           ========================================================================== */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+
+        .kpi-card {
+            background: var(--bg-card);
             border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .kpi-card:hover { transform: translateY(-3px); border-color: var(--text-dim); }
+
+        .kpi-label { font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .kpi-value { font-size: 28px; font-weight: 800; line-height: 1; font-family: var(--font-mono); }
+        
+        .kpi-card.highlight-blue { border-left: 4px solid var(--blue); }
+        .kpi-card.highlight-orange { border-left: 4px solid var(--primary); }
+        .kpi-card.highlight-green { border-left: 4px solid var(--green); }
+        .kpi-card.highlight-cyan { border-left: 4px solid var(--cyan); background: linear-gradient(145deg, rgba(57,197,207,0.05), var(--bg-card)); }
+
+        .kpi-icon { width: 42px; height: 42px; background: var(--bg-input); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--primary); border: 1px solid var(--border); }
+
+        /* ==========================================================================
+           6. SEÇÃO OPERACIONAL
+           ========================================================================== */
+        .view-section { display: flex; flex-direction: column; gap: var(--gap); }
+        
+        .charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+        
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            min-height: 350px;
+            display: flex; flex-direction: column;
         }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        thead th {
-            position: sticky; top: 0; background: #161b22;
-            padding: 12px 15px; font-size: 11px; color: var(--text-dim);
-            text-transform: uppercase; border-bottom: 1px solid var(--border);
-            z-index: 10;
-        }
-        tbody td { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 12px; }
-        tbody tr:hover { background: rgba(238, 77, 45, 0.05); }
-
-        /* Filtros */
-        select, input {
-            background: var(--input); border: 1px solid var(--border);
-            color: white; padding: 10px; border-radius: 6px; width: 100%;
-            cursor: pointer; font-weight: 600;
-        }
+        .chart-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-weight: 800; font-size: 14px; }
+        .chart-header i { color: var(--primary); }
 
         /* Heatmap */
-        .hm-grid {
-            display: grid;
-            grid-template-columns: 100px repeat(7, 1fr);
-            gap: 5px; margin-top: 15px;
+        .heatmap-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+        .heatmap-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); gap: 8px; margin-top: 20px; overflow-x: auto; }
+        .hm-cell { height: 55px; border-radius: 8px; background: var(--bg-input); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; transition: var(--transition); cursor: pointer; border: 1px solid transparent; }
+        .hm-cell:hover { border-color: white; transform: scale(1.02); z-index: 10; }
+        .hm-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; text-align: center; }
+
+        /* ==========================================================================
+           7. SEÇÃO IDLE (SISTEMA DE NÍVEIS)
+           ========================================================================== */
+        .idle-breadcrumb {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 12px;
         }
-        .hm-cell {
-            height: 45px; border-radius: 4px; background: var(--input);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px; transition: 0.2s;
+        .breadcrumb-item { color: var(--text-dim); cursor: pointer; transition: 0.2s; }
+        .breadcrumb-item:hover { color: var(--primary); }
+        .breadcrumb-item.active { color: var(--text-main); }
+        .breadcrumb-sep { color: var(--border); }
+
+        .idle-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); }
+        
+        .idle-card-detail {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 25px;
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        /* Loader */
-        #loader {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: var(--bg); display:flex; flex-direction:column;
-            align-items:center; justify-content:center; z-index:9999;
-        }
-        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-container { width: 100%; height: 8px; background: var(--bg-input); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .progress-bar { height: 100%; transition: width 1s ease-in-out; }
 
-        @media (max-width: 1200px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-grid { grid-template-columns: 1fr; }
+        /* ==========================================================================
+           8. TABELA DE REGISTROS
+           ========================================================================== */
+        .table-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .table-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .search-box { position: relative; width: 350px; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+        .search-box input { background: var(--bg-input); border: 1px solid var(--border); color: white; padding: 10px 15px 10px 45px; border-radius: 10px; width: 100%; font-size: 13px; }
+        
+        .table-wrapper { max-height: 500px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead th { background: var(--bg-input); padding: 15px 20px; font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 800; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
+        tbody td { padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 12px; }
+        tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+        tbody tr:hover { background: rgba(238, 77, 45, 0.05); }
+
+        /* ==========================================================================
+           9. LOADING E MODAIS
+           ========================================================================== */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-deep); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 9999;
+        }
+        .loader-ring { width: 60px; height: 60px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* ==========================================================================
+           10. RESPONSIVIDADE
+           ========================================================================== */
+        @media (max-width: 1400px) {
+            .charts-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 1024px) {
+            .kpi-grid, .charts-row, .idle-grid { grid-template-columns: 1fr; }
+            .header-tools { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <p style="margin-top: 15px; font-weight: 700; letter-spacing: 1px;">CARREGANDO REGISTROS EOS-BR...</p>
+    <!-- Overlay de Sincronização -->
+    <div id="loadingOverlay">
+        <div class="loader-ring"></div>
+        <h2 style="font-weight: 800; letter-spacing: 1px;">SINCRO EOS-BR</h2>
+        <p style="color: var(--text-dim); margin-top: 10px;">Lendo base dinâmica do Google Sheets...</p>
     </div>
 
-    <div class="app-container">
-        <header>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="background: var(--primary); color:white; padding: 5px 12px; border-radius: 6px; font-weight: 900; font-size: 20px;">S</div>
-                <h1 style="font-size: 20px; font-weight: 800;">CONTROLE ANALÍTICO <span style="color:var(--primary)">EOS-BR</span></h1>
-            </div>
-            <div style="text-align: right;">
-                <div id="clock" style="font-family: 'JetBrains Mono'; font-size: 18px; color: var(--primary);">00:00:00</div>
-                <div style="font-size: 10px; color: var(--green); font-weight: 800;"><i class="fas fa-circle"></i> BASE OPERACIONAL ATIVA</div>
-            </div>
-        </header>
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-brand">
+            <div class="logo-box">S</div>
+            <h1 class="header-title">SISTEMA ANALÍTICO <span>EOS-BR</span></h1>
+        </div>
+        <div class="header-tools">
+            <div class="status-pill">CONEXÃO ATIVA</div>
+            <div id="clockDisplay" class="clock">00:00:00</div>
+        </div>
+    </header>
 
-        <section class="filters-area">
-            <select id="fMes"><option value="">Mês: Todos</option></select>
-            <select id="fTurno"><option value="">Turno: Todos</option></select>
-            <select id="fCd"><option value="">CD: Todos</option></select>
-            <select id="fArea"><option value="">Área: Todas</option></select>
-            <input type="text" id="fSearch" placeholder="Pesquisar responsável ou cargo...">
+    <main class="dashboard-main">
+        
+        <!-- Barra de Filtros Master -->
+        <section class="filter-bar">
+            <select id="modeSelect" class="select-mode" onchange="Dashboard.toggleMode()">
+                <option value="operacional">ANÁLISE OPERACIONAL</option>
+                <option value="idle">ANÁLISE IDLE (DDSMA/DDQA)</option>
+            </select>
+            <select id="fMes" onchange="Dashboard.applyFilters()"><option value="">Mês: Todos</option></select>
+            <select id="fTurno" onchange="Dashboard.applyFilters()"><option value="">Turno: Todos</option></select>
+            <select id="fCd" onchange="Dashboard.applyFilters()"><option value="">CD: Todos</option></select>
+            <select id="fCargo" onchange="Dashboard.applyFilters()"><option value="">Cargo: Todos</option></select>
         </section>
 
+        <!-- KPIs Globais -->
         <section class="kpi-grid">
-            <div class="card kpi-card">
-                <div class="kpi-data"><span>Registros Totais</span><h2 id="kpi-total">0</h2></div>
-                <div class="icon-box"><i class="fas fa-database" style="color: var(--blue)"></i></div>
+            <article class="kpi-card highlight-blue">
+                <div><span class="kpi-label">Registros Capturados</span><div id="kpiTotal" class="kpi-value">0</div></div>
+                <div class="kpi-icon"><i class="fas fa-database"></i></div>
+            </article>
+            <article class="kpi-card highlight-orange">
+                <div><span class="kpi-label">Liderança Turno</span><div id="kpiLider" class="kpi-value">-</div></div>
+                <div class="kpi-icon"><i class="fas fa-users-cog"></i></div>
+            </article>
+            <article class="kpi-card highlight-green">
+                <div><span class="kpi-label">Meta Global OPA</span><div class="kpi-value">95%</div></div>
+                <div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
+            </article>
+            <article class="kpi-card highlight-cyan">
+                <div><span class="kpi-label">Aderência Brasil</span><div id="kpiIdle" class="kpi-value">0%</div></div>
+                <div class="kpi-icon" style="color:var(--cyan)"><i class="fas fa-globe-americas"></i></div>
+            </article>
+        </section>
+
+        <!-- VISÃO 1: OPERACIONAL -->
+        <section id="viewOperational" class="view-section">
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-header"><i class="fas fa-chart-bar"></i> Distribuição por Turno</div>
+                    <canvas id="chartTurno"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header"><i class="fas fa-warehouse"></i> Registros por CD</div>
+                    <canvas id="chartCD"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header"><i class="fas fa-th-large"></i> Top 10 Áreas Ativas</div>
+                    <canvas id="chartArea"></canvas>
+                </div>
             </div>
-            <div class="card kpi-card">
-                <div class="kpi-data"><span>IDLE Brasil (Médio)</span><h2 id="kpi-idle" style="color: var(--cyan)">0%</h2></div>
-                <div class="icon-box"><i class="fas fa-clock" style="color: var(--cyan)"></i></div>
-            </div>
-            <div class="card kpi-card">
-                <div class="kpi-data"><span>OPA Geral (Médio)</span><h2 id="kpi-opa" style="color: var(--yellow)">0%</h2></div>
-                <div class="icon-box"><i class="fas fa-gauge-high" style="color: var(--yellow)"></i></div>
-            </div>
-            <div class="card kpi-card">
-                <div class="kpi-data"><span>DDSMA / DDQA OK</span><h2 id="kpi-conformidade" style="color: var(--green)">0%</h2></div>
-                <div class="icon-box"><i class="fas fa-shield-check" style="color: var(--green)"></i></div>
+
+            <div class="heatmap-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="chart-header"><i class="fas fa-calendar-alt"></i> Heatmap Semanal de Intensidade</div>
+                    <select id="hmCDFilter" onchange="Dashboard.renderHeatmap()" style="width: 250px;">
+                        <option value="">Geral (Toda Rede)</option>
+                    </select>
+                </div>
+                <div id="heatmapGrid" class="heatmap-grid"></div>
             </div>
         </section>
 
-        <section class="charts-grid">
-            <div class="card"><h3>Volume por Turno</h3><div style="height:250px"><canvas id="chartTurno"></canvas></div></div>
-            <div class="card"><h3>Volume por CD</h3><div style="height:250px"><canvas id="chartCD"></canvas></div></div>
-            <div class="card"><h3>Registros por Área</h3><div style="height:250px"><canvas id="chartArea"></canvas></div></div>
-        </section>
-
-        <section class="card section-heatmap">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Heatmap Semanal de Ocupação</h3>
-                <span style="font-size: 11px; color: var(--text-dim);">Baseado no volume de registros por dia/turno</span>
+        <!-- VISÃO 2: IDLE (DRILL-DOWN) -->
+        <section id="viewIdle" class="view-section hidden">
+            <div class="idle-breadcrumb" id="idlePath">
+                <span class="breadcrumb-item" onclick="IdleSystem.navigate(1)">Brasil</span>
             </div>
-            <div id="hmGrid" class="hm-grid"></div>
+
+            <div id="idleLevel1" class="idle-grid">
+                <!-- Conteúdo Nível 1 - Brasil -->
+                <div class="idle-card-detail">
+                    <h3>IDLE Nacional por CD</h3>
+                    <div id="brCdList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+                </div>
+                <div class="idle-card-detail">
+                    <h3>OPA Nacional por Turno</h3>
+                    <div id="brTurnoList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+                </div>
+            </div>
+
+            <div id="idleLevel2" class="idle-grid hidden">
+                <!-- Conteúdo Nível 2 - CD Específico -->
+                <div class="idle-card-detail">
+                    <h3 id="lvl2Title">Performance do CD</h3>
+                    <div id="cdAreaList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header"><i class="fas fa-chart-line"></i> Evolução Diária da Meta</div>
+                    <canvas id="chartCdDaily"></canvas>
+                </div>
+            </div>
         </section>
 
-        <section class="card section-table">
-            <h3 style="margin-bottom: 15px;">Histórico Detalhado (1000+ Linhas)</h3>
+        <!-- Tabela Geral de Histórico -->
+        <section class="table-section">
+            <div class="table-header">
+                <h3 style="font-weight: 800;">Histórico Geral de Registros EOS-BR</h3>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tableSearch" placeholder="Pesquisar por nome, cargo ou CD..." onkeyup="Dashboard.applyFilters()">
+                </div>
+            </div>
             <div class="table-wrapper">
-                <table>
+                <table id="mainTable">
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>CD</th>
+                            <th>Data Registro</th>
+                            <th>Mês</th>
+                            <th>CD Operacional</th>
                             <th>Responsável</th>
+                            <th>Cargo</th>
                             <th>Turno</th>
                             <th>Área</th>
                             <th>IDLE %</th>
-                            <th>OPA %</th>
                             <th>Status (DDSMA/DDQA)</th>
                         </tr>
                     </thead>
@@ -250,205 +407,329 @@
                 </table>
             </div>
         </section>
-    </div>
 
+    </main>
+
+    <footer style="padding: 40px; text-align: center; color: var(--text-dim); font-size: 11px; letter-spacing: 1px;">
+        SHOPEE OPERATIONS EOS-BR &copy; 2026 | DASHBOARD ANALÍTICO DE ALTA PERFORMANCE
+    </footer>
+
+    <!-- LÓGICA CORE -->
     <script>
-        // URL de exportação direta para CSV
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1wTNxkSsq3RAdzJ7n8NLFvwLHvR-_T6SnunsCXRopGcY/export?format=csv&gid=0';
+        /**
+         * DASHBOARD CORE MODULE
+         * Lida com fetch de dados, filtros e renderização operacional.
+         */
+        const Dashboard = {
+            config: {
+                // URL DE EXPORTAÇÃO DIRETA DO GOOGLE SHEETS
+                url: 'https://docs.google.com/spreadsheets/d/1wTNxkSsq3RAdzJ7n8NLFvwLHvR-_T6SnunsCXRopGcY/export?format=csv&gid=0',
+                meses: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+                dias: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
+            },
+            data: { raw: [], filtered: [], charts: {} },
 
-        const State = {
-            raw: [],
-            filtered: [],
-            charts: {}
-        };
-
-        const App = {
             async init() {
                 this.updateClock();
                 try {
-                    const response = await fetch(CSV_URL);
-                    const csvText = await response.text();
-                    this.processData(csvText);
-                    this.fillFilters();
+                    const csvData = await this.fetchSpreadsheet();
+                    this.data.raw = this.parseCSV(csvData);
+                    this.setupDropdowns();
                     this.initCharts();
                     this.applyFilters();
-                    document.getElementById('loader').style.display = 'none';
-                } catch (e) {
-                    console.error(e);
-                    alert("Erro ao conectar com a base de dados. Verifique a internet.");
-                }
-
-                // Event Listeners
-                ['fMes', 'fTurno', 'fCd', 'fArea'].forEach(id => {
-                    document.getElementById(id).addEventListener('change', () => this.applyFilters());
-                });
-                document.getElementById('fSearch').addEventListener('input', () => this.applyFilters());
-            },
-
-            processData(csv) {
-                const lines = csv.split(/\r?\n/);
-                const headers = lines[0].split(',').map(h => h.trim());
-                
-                this.raw = lines.slice(1).filter(l => l.trim()).map(line => {
-                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Regex para tratar vírgulas dentro de aspas
                     
-                    // Mapeamento baseado na sua estrutura
-                    const dataObj = {
-                        data: cols[0]?.replace(/"/g, '') || '',
-                        cd: cols[1]?.replace(/"/g, '') || '',
-                        responsavel: cols[2]?.replace(/"/g, '') || '',
-                        cargo: cols[3]?.replace(/"/g, '') || '',
-                        turno: cols[4]?.replace(/"/g, '') || '',
-                        area: cols[5]?.replace(/"/g, '') || '',
-                        ddsma: cols[6]?.replace(/"/g, '') || '',
-                        ddqa: cols[8]?.replace(/"/g, '') || '',
-                        idle: parseFloat(cols[12]?.replace(/[^0-9.]/g, '')) || 0,
-                        opa: parseFloat(cols[13]?.replace(/[^0-9.]/g, '')) || 0
-                    };
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                } catch (e) {
+                    console.error("Erro crítico de conexão:", e);
+                    alert("Não foi possível conectar à base de dados. Verifique se a planilha está pública!");
+                }
+            },
 
-                    // Extrair Mês e Dia da Semana
-                    if (dataObj.data) {
-                        const parts = dataObj.data.split(' ')[0].split('/');
-                        const date = new Date(parts[2], parts[1]-1, parts[0]);
-                        dataObj.mesNum = parts[1];
-                        dataObj.mesNome = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][parts[1]-1];
-                        dataObj.diaSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][date.getDay()];
-                    }
-                    return dataObj;
+            async fetchSpreadsheet() {
+                const response = await fetch(this.config.url);
+                if (!response.ok) throw new Error("HTTP Error " + response.status);
+                return await response.text();
+            },
+
+            parseCSV(text) {
+                const lines = text.split(/\r?\n/);
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                
+                return lines.slice(1).filter(l => l.trim()).map(line => {
+                    // Regex robusto para CSV (respeita vírgulas em aspas)
+                    const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const obj = {};
+                    
+                    headers.forEach((h, i) => {
+                        let val = values[i]?.replace(/"/g, '').trim() || "N/A";
+                        obj[h] = val;
+                    });
+
+                    // Tratamento e Normalização de Campos
+                    const dataParts = obj['data registro']?.split(' ')[0].split('/') || [];
+                    const dObj = dataParts.length === 3 ? new Date(dataParts[2], dataParts[1]-1, dataParts[0]) : new Date();
+                    
+                    return {
+                        ...obj,
+                        dateObj: dObj,
+                        mes: this.config.meses[dObj.getMonth()],
+                        diaSemana: this.config.dias[dObj.getDay() === 0 ? 6 : dObj.getDay() - 1],
+                        cd: (obj['cd operacional'] || 'N/A').toUpperCase().replace('JABOATAO', 'BRFPE1'),
+                        idle_val: parseFloat(obj['idle time %']?.replace('%', '').replace(',', '.')) || 0,
+                        opa_val: parseFloat(obj['opa']?.replace('%', '').replace(',', '.')) || 0,
+                        area: obj['área atuação'] || 'NÃO DEFINIDO'
+                    };
                 });
             },
 
-            fillFilters() {
-                const unique = (key) => [...new Set(this.raw.map(d => d[key]))].filter(Boolean).sort();
+            setupDropdowns() {
+                const getUnique = (key) => [...new Set(this.data.raw.map(d => d[key]))].filter(x => x !== "N/A").sort();
                 
-                const fill = (id, items) => {
-                    const select = document.getElementById(id);
-                    items.forEach(item => {
-                        const opt = document.createElement('option');
-                        opt.value = item;
-                        opt.innerText = item;
-                        select.appendChild(opt);
-                    });
+                const fill = (id, list, placeholder) => {
+                    const el = document.getElementById(id);
+                    el.innerHTML = `<option value="">${placeholder}</option>` + 
+                                   list.map(i => `<option value="${i}">${i}</option>`).join('');
                 };
 
-                fill('fMes', unique('mesNome'));
-                fill('fTurno', unique('turno'));
-                fill('fCd', unique('cd'));
-                fill('fArea', unique('area'));
+                fill('fMes', this.config.meses.filter(m => getUnique('mes').includes(m)), "Mês: Todos");
+                fill('fTurno', getUnique('turno'), "Turno: Todos");
+                fill('fCd', getUnique('cd'), "CD: Todos");
+                fill('fCargo', getUnique('cargo'), "Cargo: Todos");
+                fill('hmCDFilter', getUnique('cd'), "Geral (Toda Rede)");
             },
 
             applyFilters() {
-                const f = {
-                    mes: document.getElementById('fMes').value,
-                    turno: document.getElementById('fTurno').value,
-                    cd: document.getElementById('fCd').value,
-                    area: document.getElementById('fArea').value,
-                    search: document.getElementById('fSearch').value.toLowerCase()
-                };
+                const fMes = document.getElementById('fMes').value;
+                const fTurno = document.getElementById('fTurno').value;
+                const fCd = document.getElementById('fCd').value;
+                const fCargo = document.getElementById('fCargo').value;
+                const fSearch = document.getElementById('tableSearch').value.toLowerCase();
 
-                this.filtered = this.raw.filter(d => {
-                    return (!f.mes || d.mesNome === f.mes) &&
-                           (!f.turno || d.turno === f.turno) &&
-                           (!f.cd || d.cd === f.cd) &&
-                           (!f.area || d.area === f.area) &&
-                           (!f.search || d.responsavel.toLowerCase().includes(f.search) || d.cargo.toLowerCase().includes(f.search));
+                this.data.filtered = this.data.raw.filter(d => {
+                    return (!fMes || d.mes === fMes) &&
+                           (!fTurno || d.turno === fTurno) &&
+                           (!fCd || d.cd === fCd) &&
+                           (!fCargo || d.cargo === fCargo) &&
+                           (!fSearch || d.responsável?.toLowerCase().includes(fSearch) || d.cd.toLowerCase().includes(fSearch));
                 });
 
                 this.updateUI();
             },
 
             updateUI() {
-                // KPIs
-                document.getElementById('kpi-total').innerText = this.filtered.length.toLocaleString();
+                document.getElementById('kpiTotal').innerText = this.data.filtered.length.toLocaleString();
                 
-                const avgIdle = this.filtered.reduce((acc, d) => acc + d.idle, 0) / (this.filtered.length || 1);
-                const avgOpa = this.filtered.reduce((acc, d) => acc + d.opa, 0) / (this.filtered.length || 1);
-                
-                document.getElementById('kpi-idle').innerText = avgIdle.toFixed(1) + "%";
-                document.getElementById('kpi-opa').innerText = avgOpa.toFixed(1) + "%";
+                const turnos = {};
+                this.data.filtered.forEach(d => turnos[d.turno] = (turnos[d.turno] || 0) + 1);
+                document.getElementById('kpiLider').innerText = Object.keys(turnos).sort((a,b) => turnos[b] - turnos[a])[0] || '-';
 
-                const conformidade = (this.filtered.filter(d => d.ddsma === 'SIM' && d.ddqa === 'SIM').length / (this.filtered.length || 1)) * 100;
-                document.getElementById('kpi-conformidade').innerText = conformidade.toFixed(1) + "%";
+                const idleAvg = (this.data.filtered.reduce((acc, d) => acc + d.idle_val, 0) / (this.data.filtered.length || 1)).toFixed(1);
+                document.getElementById('kpiIdle').innerText = idleAvg + "%";
 
-                this.renderTable();
-                this.renderHeatmap();
                 this.updateCharts();
+                this.renderHeatmap();
+                this.renderTable();
+                
+                // Atualiza IDLE drill-down se estiver ativo
+                if (document.getElementById('modeSelect').value === 'idle') IdleSystem.update();
             },
 
             initCharts() {
                 Chart.register(ChartDataLabels);
-                const config = (color) => ({
+                const baseOpt = {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold' } } },
-                    scales: { 
-                        x: { ticks: { color: '#8b949e' }, grid: { display: false } },
-                        y: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: { anchor: 'end', align: 'top', color: '#8b949e', font: { weight: 'bold', size: 9 } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 9 } } },
+                        y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e' }, beginAtZero: true }
                     }
+                };
+
+                this.data.charts.turno = new Chart(document.getElementById('chartTurno'), {
+                    type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] },
+                    options: baseOpt
                 });
 
-                this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: config() });
-                this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: config() });
-                this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#8957e5', data: [] }] }, options: config() });
+                this.data.charts.cd = new Chart(document.getElementById('chartCD'), {
+                    type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] },
+                    options: baseOpt
+                });
+
+                this.data.charts.area = new Chart(document.getElementById('chartArea'), {
+                    type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#8957e5', data: [] }] },
+                    options: { ...baseOpt, indexAxis: 'y' }
+                });
             },
 
             updateCharts() {
-                const update = (chart, key) => {
-                    const counts = {};
-                    this.filtered.forEach(d => counts[d[key]] = (counts[d[key]] || 0) + 1);
-                    chart.data.labels = Object.keys(counts);
-                    chart.data.datasets[0].data = Object.values(counts);
+                const getCounts = (key) => {
+                    const c = {};
+                    this.data.filtered.forEach(d => c[d[key]] = (c[d[key]] || 0) + 1);
+                    return c;
+                };
+
+                const up = (chart, data) => {
+                    chart.data.labels = Object.keys(data).sort((a,b) => data[b] - data[a]).slice(0, 10);
+                    chart.data.datasets[0].data = chart.data.labels.map(l => data[l]);
                     chart.update();
                 };
-                update(this.charts.turno, 'turno');
-                update(this.charts.cd, 'cd');
-                update(this.charts.area, 'area');
+
+                up(this.data.charts.turno, getCounts('turno'));
+                up(this.data.charts.cd, getCounts('cd'));
+                up(this.data.charts.area, getCounts('area'));
             },
 
             renderHeatmap() {
-                const grid = document.getElementById('hmGrid');
-                const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-                const turnos = [...new Set(this.raw.map(d => d.turno))].filter(Boolean).sort();
-
-                let html = `<div></div>` + dias.map(d => `<div style="text-align:center; font-size:10px; color:var(--text-dim)">${d.substring(0,3)}</div>`).join('');
+                const container = document.getElementById('heatmapGrid');
+                const selectedCd = document.getElementById('hmCDFilter').value;
+                const hData = selectedCd ? this.data.filtered.filter(d => d.cd === selectedCd) : this.data.filtered;
                 
+                const turnos = [...new Set(this.data.raw.map(d => d.turno))].filter(Boolean).sort();
+                const dias = this.config.dias;
+
+                let html = `<div></div>` + dias.map(d => `<div class="hm-label">${d.substring(0,3)}</div>`).join('');
+
                 turnos.forEach(t => {
-                    html += `<div style="font-weight:700; color:var(--blue)">${t}</div>`;
+                    html += `<div class="hm-label" style="text-align:left; color:var(--blue)">${t}</div>`;
                     dias.forEach(d => {
-                        const count = this.filtered.filter(x => x.turno === t && x.diaSemana === d).length;
-                        const opacity = count > 0 ? Math.min(count / 15, 1) : 0.05;
+                        const count = hData.filter(x => x.turno === t && x.diaSemana === d).length;
+                        const opacity = count > 0 ? Math.min(count / 20, 1) : 0.05;
                         html += `<div class="hm-cell" style="background: rgba(238, 77, 45, ${opacity}); color: ${opacity > 0.5 ? '#fff' : 'var(--text-dim)'}">${count}</div>`;
                     });
                 });
-                grid.innerHTML = html;
+                container.innerHTML = html;
             },
 
             renderTable() {
                 const body = document.getElementById('tableBody');
-                body.innerHTML = this.filtered.slice(0, 1000).map(d => `
+                body.innerHTML = this.data.filtered.slice(0, 500).map(d => `
                     <tr>
-                        <td style="font-family:var(--font-mono); color:var(--primary)">${d.data}</td>
-                        <td style="font-weight:700">${d.cd}</td>
-                        <td>${d.responsavel}</td>
-                        <td style="color:var(--blue); font-weight:700">${d.turno}</td>
+                        <td style="font-family:var(--font-mono); font-size:11px;">${d['data registro']}</td>
+                        <td>${d.mes}</td>
+                        <td style="color:var(--blue); font-weight:700;">${d.cd}</td>
+                        <td>${d.responsável}</td>
+                        <td>${d.cargo}</td>
+                        <td style="color:var(--primary); font-weight:700;">${d.turno}</td>
                         <td>${d.area}</td>
-                        <td style="font-weight:700">${d.idle}%</td>
-                        <td style="font-weight:700">${d.opa}%</td>
+                        <td style="font-weight:800;">${d.idle_val}%</td>
                         <td>
-                            <i class="fas fa-shield-check" style="color:${d.ddsma==='SIM'?'var(--green)':'#ff4444'}"></i>
-                            <i class="fas fa-check-circle" style="color:${d.ddqa==='SIM'?'var(--green)':'#ff4444'}"></i>
+                            <i class="fas fa-shield-alt" style="color:${d.ddsma === 'SIM' ? 'var(--green)' : '#ff4444'}"></i>
+                            <i class="fas fa-check-circle" style="color:${d.ddqa === 'SIM' ? 'var(--green)' : '#ff4444'}"></i>
                         </td>
                     </tr>
                 `).join('');
             },
 
+            toggleMode() {
+                const mode = document.getElementById('modeSelect').value;
+                document.getElementById('viewOperational').classList.toggle('hidden', mode !== 'operacional');
+                document.getElementById('viewIdle').classList.toggle('hidden', mode !== 'idle');
+                if (mode === 'idle') IdleSystem.update();
+            },
+
             updateClock() {
                 setInterval(() => {
-                    document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR');
+                    document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('pt-BR');
                 }, 1000);
             }
         };
 
-        App.init();
+        /**
+         * IDLE DRILL-DOWN SYSTEM
+         * Lida com a navegação hierárquica e cálculo de gaps.
+         */
+        const IdleSystem = {
+            currentLevel: 1,
+            selectedCD: null,
+            
+            update() {
+                if (this.currentLevel === 1) this.renderBrasil();
+                else if (this.currentLevel === 2) this.renderCDDetail();
+            },
+
+            navigate(level, param = null) {
+                this.currentLevel = level;
+                if (level === 1) this.selectedCD = null;
+                if (level === 2) this.selectedCD = param;
+
+                document.getElementById('idleLevel1').classList.toggle('hidden', level !== 1);
+                document.getElementById('idleLevel2').classList.toggle('hidden', level !== 2);
+                
+                this.renderBreadcrumb();
+                this.update();
+            },
+
+            renderBreadcrumb() {
+                const path = document.getElementById('idlePath');
+                let html = `<span class="breadcrumb-item" onclick="IdleSystem.navigate(1)">Brasil</span>`;
+                if (this.selectedCD) {
+                    html += `<span class="breadcrumb-sep">/</span><span class="breadcrumb-item active">${this.selectedCD}</span>`;
+                }
+                path.innerHTML = html;
+            },
+
+            renderBrasil() {
+                const cds = [...new Set(Dashboard.data.raw.map(d => d.cd))].sort();
+                const list = document.getElementById('brCdList');
+                
+                list.innerHTML = cds.map(cd => {
+                    const data = Dashboard.data.filtered.filter(d => d.cd === cd);
+                    const avg = (data.reduce((acc, d) => acc + d.idle_val, 0) / (data.length || 1)).toFixed(1);
+                    const color = avg >= 95 ? 'var(--green)' : (avg >= 90 ? 'var(--yellow)' : 'var(--primary)');
+                    
+                    return `
+                        <div onclick="IdleSystem.navigate(2, '${cd}')" style="cursor:pointer">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                                <span>${cd}</span>
+                                <span style="font-weight:800; color:${color}">${avg}%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar" style="width:${avg}%; background:${color}"></div></div>
+                        </div>
+                    `;
+                }).join('');
+
+                const turnos = ["T1", "T2", "T3"];
+                document.getElementById('brTurnoList').innerHTML = turnos.map(t => {
+                    const data = Dashboard.data.filtered.filter(d => d.turno === t);
+                    const avg = (data.reduce((acc, d) => acc + d.opa_val, 0) / (data.length || 1)).toFixed(1);
+                    return `
+                        <div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                                <span>Turno ${t}</span>
+                                <span style="font-weight:800; color:var(--blue)">${avg}%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar" style="width:${avg}%; background:var(--blue)"></div></div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            renderCDDetail() {
+                document.getElementById('lvl2Title').innerText = `Performance Detalhada: ${this.selectedCD}`;
+                const dataCd = Dashboard.data.filtered.filter(d => d.cd === this.selectedCD);
+                const areas = [...new Set(dataCd.map(d => d.area))].sort();
+
+                document.getElementById('cdAreaList').innerHTML = areas.map(a => {
+                    const dataArea = dataCd.filter(d => d.area === a);
+                    const avg = (dataArea.reduce((acc, d) => acc + d.idle_val, 0) / (dataArea.length || 1)).toFixed(1);
+                    return `
+                        <div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                                <span>${a}</span>
+                                <span style="font-weight:800">${avg}%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar" style="width:${avg}%; background:var(--cyan)"></div></div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        };
+
+        // Boot do Sistema
+        document.addEventListener('DOMContentLoaded', () => Dashboard.init());
     </script>
 </body>
 </html>
