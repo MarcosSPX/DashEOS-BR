@@ -980,14 +980,20 @@
                     }
                 } catch(err) { console.error("Erro data:", err); }
                 
-                // Normalização de CDs para os gráficos (conforme a imagem do dashboard)
-                let cdNorm = item.cd ? item.cd.toString().toUpperCase().trim() : " ";
-                if (cdNorm.includes("FRANCO 1")) cdNorm = "BRFSP1";
-                if (cdNorm.includes("FRANCO 2")) cdNorm = "BRFSP2";
-                if (cdNorm.includes("JABOATAO")) cdNorm = "BRFPE1";
-                if (cdNorm.includes("NOVA SANTA RITA")) cdNorm = "BRFRS1";
-                if (cdNorm.includes("HIDROL")) cdNorm = "BRFGO1";
-                if (cdNorm.includes("CONTAGEM")) cdNorm = "BRFMG1";
+                // CORREÇÃO DE CD: Normalização dinâmica para evitar que tudo apareça como BRFSP1
+                let cdRaw = (item.cd || "").toString().toUpperCase().trim();
+                let cdNorm = cdRaw;
+
+                // Mapeamento De-Para inteligente baseado nos nomes da Shopee
+                if (cdRaw.includes("FRANCO 1") || cdRaw === "FRANCO1") cdNorm = "BRFSP1";
+                else if (cdRaw.includes("FRANCO 2") || cdRaw === "FRANCO2") cdNorm = "BRFSP2";
+                else if (cdRaw.includes("JABOATAO") || cdRaw.includes("PE1")) cdNorm = "BRFPE1";
+                else if (cdRaw.includes("SANTA RITA") || cdRaw.includes("RS1")) cdNorm = "BRFRS1";
+                else if (cdRaw.includes("HIDROL") || cdRaw.includes("GO1")) cdNorm = "BRFGO1";
+                else if (cdRaw.includes("CONTAGEM") || cdRaw.includes("MG1")) cdNorm = "BRFMG1";
+                
+                // Se o campo estiver vazio, define como "N/A" ao invés de forçar um CD fixo
+                if (!cdNorm || cdNorm === "") cdNorm = "N/A";
 
                 return {
                     ...item,
@@ -999,7 +1005,8 @@
                 };
             });
 
-            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(Boolean).sort();
+            // Remove o "N/A" da lista de filtros para manter a interface limpa
+            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(d => d !== "N/A").sort();
             this.turnosEixo = ["T1", "T2", "T3", "T4", "T5", "T6", "T7"];
             
             const mesesPlanilha = [...new Set(this.rawData.map(d => d.mes))].filter(Boolean);
@@ -1057,7 +1064,6 @@
             this.filteredData.forEach(d => tCounts[d.turno] = (tCounts[d.turno] || 0) + 1);
             document.getElementById('kpi-turno').innerText = Object.keys(tCounts).sort((a,b) => tCounts[b] - tCounts[a])[0] || '-';
 
-            // Cálculo Real de IDLE operacional
             const idleRealCalculado = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE TIME");
             const idleVal = idleRealCalculado !== null ? idleRealCalculado.toFixed(1) : (85 + (this.filteredData.length % 15)).toFixed(1);
             
