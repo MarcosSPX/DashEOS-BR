@@ -865,7 +865,7 @@
     Chart.register(ChartDataLabels);
 
     // Link do Web App do Google Apps Script atualizado conforme solicitado
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbwQ261mMl0ZI8wj-W_sMsSH9C38n8WesPlToFnTbjQLg1QyKYPhkIZ91uxyiSi4-BWj/exec';
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbzgJuieteVf6bncQOCxExZl7mRVGvgx4_KSrAGp0daqsAc8RJcSIMBPNmMN09WJSVPM/exec';
     const CACHE_KEY = 'eos_dashboard_cache';
     const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
     const CACHE_DURATION = 30 * 1000; 
@@ -980,11 +980,11 @@
                     }
                 } catch(err) { console.error("Erro data:", err); }
                 
-                // CORREÇÃO DE CD: Normalização dinâmica para evitar que tudo apareça como BRFSP1
+                // CORREÇÃO DE CD: Normalização dinâmica baseada na coluna CD Operacional
                 let cdRaw = (item.cd || "").toString().toUpperCase().trim();
                 let cdNorm = cdRaw;
 
-                // Mapeamento De-Para inteligente baseado nos nomes da Shopee
+                // Mapeamento De-Para inteligente baseado nos nomes reais da Shopee
                 if (cdRaw.includes("FRANCO 1") || cdRaw === "FRANCO1") cdNorm = "BRFSP1";
                 else if (cdRaw.includes("FRANCO 2") || cdRaw === "FRANCO2") cdNorm = "BRFSP2";
                 else if (cdRaw.includes("JABOATAO") || cdRaw.includes("PE1")) cdNorm = "BRFPE1";
@@ -992,7 +992,7 @@
                 else if (cdRaw.includes("HIDROL") || cdRaw.includes("GO1")) cdNorm = "BRFGO1";
                 else if (cdRaw.includes("CONTAGEM") || cdRaw.includes("MG1")) cdNorm = "BRFMG1";
                 
-                // Se o campo estiver vazio, define como "N/A" ao invés de forçar um CD fixo
+                // Se o campo estiver vazio, define como "N/A" para visualização na tabela, mas não afeta gráficos de CD
                 if (!cdNorm || cdNorm === "") cdNorm = "N/A";
 
                 return {
@@ -1005,7 +1005,7 @@
                 };
             });
 
-            // Remove o "N/A" da lista de filtros para manter a interface limpa
+            // Extrai a lista de CDs únicos (ignorando N/A)
             this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(d => d !== "N/A").sort();
             this.turnosEixo = ["T1", "T2", "T3", "T4", "T5", "T6", "T7"];
             
@@ -1328,7 +1328,7 @@
             "CHECKING LEVE": ["DDSMA", "DDQA", "META DMO", "SOBRAS", "FALTA", "AVARIAS", "ENTREGAS DE COTs CHECKING", "IDLE TIME", "OPA", "AUDITORIA CHECKING"],
             "CHECKING VOL": ["DDSMA", "DDQA", "META DMO", "SOBRAS", "FALTA", "AVARIAS", "ENTREGAS DE COTs CHECKING", "IDLE TIME", "OPA", "AUDITORIA CHECKING"],
             "SHIPPING": ["DDSMA", "DDQA", "SLA TRANSPORTING", "PROD. TO PACKING - ESTEIRA (1) PEQ.", "PROD. TO PACKING - ESTEIRA (2) GDE.", "PRODUÇÃO GERAL", "QTD CHECKED", "TOTAL DE HC PRESENTE", "NET", "ABS", "OPA"],
-            "INVENTARIO": ["DDSMA", "DDQA", "ESTOQUE ATUAL DE AV", "ESTOQUE ATUAL DE DEM", "ESTOQUE ATUAL GERAL", "TOTAL DE ENDEREÇOS", "ENDEREÇOS DESBLOQUEADOS", "ENDEREÇOS OCUPADOS", "OB PICKING", "META DMO", "OPA"],
+            "INVENTARIO": ["DDSMA", "DDQA", "ESTOQUE ATUAL DE AV", "ESTOQUE ATUAL DE DEM", "ESTOQUE ATUAL GERAL", "TOTAL DE ENDEREÇO", "ENDEREÇOS DESBLOQUEADOS", "ENDEREÇOS OCUPADOS", "OB PICKING", "META DMO", "OPA"],
             "IBT": ["DDSMA", "DDQA", "PEÇAS TRATADAS NO DIA", "SURPLUS", "SHORTAGES", "IA", "INV", "SKU", "PENDENTES", "MTO", "MTO FAIL", "CHECKED", "PEÇAS AGUARDANDO TRATATIVAS", "OPA"],
             "QUALIDADE": [
                 "ABERTURA DE TURNO", "HC ESPERADOS", "HC PRESENTES", "HC AUSENTES", "ABS", "EQUIPAMENTOS", "NOTEBOOK", 
