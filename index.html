@@ -29,12 +29,7 @@
             --font-main: 'Plus Jakarta Sans', sans-serif;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            outline: none; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
             background-color: var(--bg-deep);
@@ -91,48 +86,6 @@
             letter-spacing: 0.3px;
         }
 
-        .filter-group select:hover, .cd-select-custom:hover {
-            border-color: var(--shopee-orange);
-            box-shadow: 0 0 10px var(--shopee-orange-glow);
-        }
-
-        .filter-group select:focus, .cd-select-custom:focus {
-            border-color: var(--shopee-orange);
-            box-shadow: 0 0 12px rgba(238, 77, 45, 0.3);
-        }
-
-        .filter-special {
-            background: linear-gradient(135deg, #ee4d2d, #ff8c00) !important;
-            color: white !important;
-            font-weight: 800 !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
-            box-shadow: 0 0 15px rgba(238, 77, 45, 0.5) !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            letter-spacing: 0.5px;
-            padding: 0 15px !important;
-            height: 32px !important;
-            font-size: 11px !important;
-            display: inline-block;
-            line-height: 30px;
-            vertical-align: middle;
-            transition: all 0.3s ease !important;
-        }
-        .filter-special:hover {
-            box-shadow: 0 0 22px rgba(238, 77, 45, 0.7) !important;
-            transform: translateY(-1px);
-        }
-        
-        .filter-special option {
-            background-color: var(--bg-input) !important;
-            color: var(--text-main) !important;
-            font-weight: 600;
-        }
-        
-        .filter-group select option, .cd-select-custom option {
-            background-color: var(--bg-input) !important;
-            color: var(--text-main) !important;
-        }
-
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -149,24 +102,6 @@
             align-items: center;
             justify-content: space-between;
         }
-
-        .kpi-card.idle-card {
-            border-color: var(--accent-cyan);
-            background: linear-gradient(135deg, rgba(57, 197, 207, 0.05), var(--bg-card));
-        }
-
-        .kpi-left { display: flex; flex-direction: column; }
-        .kpi-label { font-size: 11px; color: var(--text-dim); font-weight: 500; }
-        .kpi-value { font-size: 18px; font-weight: 800; margin-top: 2px; line-height: 1; }
-
-        .kpi-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .kpi-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(238, 77, 45, 0.1); color: var(--shopee-orange); font-size: 12px; }
-        .kpi-icon.cyan { background: rgba(57, 197, 207, 0.1); color: var(--accent-cyan); }
-        .kpi-trend { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; }
-        .trend-up { background: rgba(63, 185, 80, 0.1); color: var(--accent-green); }
-        .trend-warning { background: rgba(210, 153, 34, 0.1); color: var(--accent-yellow); }
-        .trend-danger { background: rgba(238, 77, 45, 0.1); color: var(--shopee-orange); }
-        .trend-cyan { background: rgba(57, 197, 207, 0.1); color: var(--accent-cyan); }
 
         .charts-container {
             display: grid;
@@ -186,77 +121,6 @@
             position: relative;
         }
 
-        .c-span-4 { grid-column: span 4; }
-        .c-span-6 { grid-column: span 6; }
-        .c-span-8 { grid-column: span 8; }
-        .c-span-12 { grid-column: span 12; }
-
-        .chart-box canvas {
-            flex: 1;
-            min-height: 0;
-            width: 100% !important;
-        }
-
-        .chart-box-header { 
-            margin-bottom: 6px; 
-            font-weight: 700; 
-            font-size: 12px; 
-            color: var(--text-main); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-        }
-        .chart-title-left { display: flex; align-items: center; gap: 6px; }
-        
-        .chart-controls { display: flex; gap: 6px; align-items: center; }
-        .chart-controls select {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            height: 22px;
-            cursor: pointer;
-        }
-
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: 80px repeat(7, 1fr);
-            gap: 4px;
-        }
-        .heatmap-header-cell {
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-dim);
-            font-weight: 700;
-            padding-bottom: 4px;
-        }
-        .heatmap-row-label {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            font-size: 11px;
-            color: var(--accent-blue);
-            padding-right: 8px;
-        }
-        .heatmap-cell {
-            background: #161b22;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-            position: relative;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        .heatmap-cell:hover { border-color: var(--text-main); }
-        .heatmap-cell .count { font-size: 13px; font-weight: 800; color: #fff; line-height: 1; }
-        .heatmap-cell .pct { font-size: 9px; color: rgba(255,255,255,0.6); margin-top: 3px; }
-
         .table-section { padding: 0 15px 15px 15px; }
         .table-wrapper {
             background: var(--bg-card);
@@ -265,150 +129,49 @@
             overflow: hidden;
         }
 
-        .table-header {
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-container { position: relative; }
-        .search-container i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 11px; }
-        .search-container input {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 4px 10px 4px 28px;
-            border-radius: 6px;
-            width: 200px;
-            font-size: 11px;
-            height: 24px;
-        }
-
-        .table-scroll { max-height: 380px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #161b22; padding: 6px 12px; font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; position: sticky; top: 0; z-index: 10; }
-        td { padding: 6px 12px; border-bottom: 1px solid var(--border); font-size: 11px; }
-        tr:hover { background: rgba(238, 77, 45, 0.04); }
-
-        .error-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 7, 10, 0.95);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .hidden { display: none !important; }
-
         .breadcrumb-bar {
             background: var(--bg-card);
             border: 1px solid var(--border);
             padding: 10px 15px;
             margin: 10px 15px;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             font-weight: 600;
-            font-size: 12px;
         }
 
-        .idle-section-header {
-            padding: 0 15px;
-            margin: 15px 0 10px 0;
-        }
-
-        .idle-section-title {
-            font-size: 13px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-        }
-
-        .nav-transition-box {
-            background: rgba(13, 17, 23, 0.6);
-            border: 1px dashed var(--border);
-            padding: 12px 15px;
-            margin: 15px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .nav-transition-box.active {
-            border-style: solid;
-            border-color: var(--shopee-orange);
-            background: rgba(238, 77, 45, 0.02);
-        }
+        .hidden { display: none !important; }
 
         #loadingOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 7, 10, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 10, 0.9); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 10000;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @media (max-width: 1100px) {
-            .c-span-4, .c-span-6, .c-span-8 { grid-column: span 12; }
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        .heatmap-grid { display: grid; grid-template-columns: 80px repeat(7, 1fr); gap: 4px; }
+        .heatmap-cell { background: #161b22; border-radius: 4px; display: flex; align-items: center; justify-content: center; min-height: 35px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #161b22; padding: 6px 12px; font-size: 10px; color: var(--text-dim); text-align: left; }
+        td { padding: 6px 12px; border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text-main); }
     </style>
 </head>
 <body>
 
 <div id="loadingOverlay">
     <div style="border: 4px solid var(--border); border-top: 4px solid var(--shopee-orange); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
-    <h3 style="font-family: var(--font-main); color: var(--text-main); font-size: 14px; font-weight: 700;">Conectando à base analítica EOS-BR...</h3>
-    <p style="font-family: var(--font-main); color: var(--text-dim); font-size: 11px; margin-top: 5px;">Buscando informações dinâmicas do Google Sheets</p>
-</div>
-
-<div id="errorOverlay" class="error-overlay">
-    <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--shopee-orange); margin-bottom: 20px;"></i>
-    <h2 id="errorMessage">Não foi possível conectar à base de dados.</h2>
-    <p style="margin-top: 10px; color: var(--text-dim); font-size: 12px;">Tentando restabelecer conexão automaticamente em instantes...</p>
-    <button onclick="window.location.reload()" style="margin-top: 20px; background: var(--shopee-orange); border: none; color: white; padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
-        <i class="fas fa-sync-alt" style="margin-right: 5px;"></i> Forçar Recarregamento
-    </button>
-</div>
-
-<div id="toastNotification" style="position: fixed; bottom: 20px; right: 20px; background: rgba(13, 17, 23, 0.95); border: 1px solid var(--shopee-orange); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; gap: 10px; transition: all 0.3s ease;">
-    <i class="fas fa-sync-alt fa-spin" style="color: var(--shopee-orange); font-size: 16px;"></i>
-    <span id="toastMessage" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Não foi possível atualizar os dados da planilha. Tentando reconectar...</span>
+    <h3 style="color: white;">Conectando à Base EOS-BR...</h3>
 </div>
 
 <header>
-<div class="logo-area">
-<div class="logo-shopee">S</div>
-<div class="logo-title">CONTROLE ANALÍTICO <span style="color:var(--shopee-orange)">EOS-BR</span></div>
-</div>
-<div class="header-tools">
-<div class="real-time-clock" id="clock">00:00:00</div>
-<div class="kpi-trend trend-warning" id="sync-status" style="padding: 2px 6px; font-weight: 700;">CONECTANDO PLANILHA...</div>
-</div>
+    <div class="logo-area">
+        <div class="logo-shopee">S</div>
+        <div class="logo-title">CONTROLE ANALÍTICO <span style="color:var(--shopee-orange)">EOS-BR</span></div>
+    </div>
+    <div class="header-tools">
+        <div class="real-time-clock" id="clock">00:00:00</div>
+        <div class="kpi-trend trend-warning" id="sync-status">CONECTANDO...</div>
+    </div>
 </header>
 
 <div class="filter-section">
@@ -418,627 +181,170 @@
             <option value="idle">ANÁLISE SUBPROCESSO</option>
         </select>
     </div>
-
-    <div class="filter-group">
-        <select id="filter-mes" onchange="Dashboard.applyFilters()"><option value="">Todos os Meses</option></select>
-    </div>
-    <div class="filter-group">
-        <select id="filter-turno" onchange="Dashboard.applyFilters()"><option value="">Todos os Turnos</option></select>
-    </div>
-    <div class="filter-group">
-        <select id="filter-cd" onchange="Dashboard.applyFilters()"><option value="">Todos os CDs</option></select>
-    </div>
-    <div class="filter-group">
-        <select id="filter-cargo" onchange="Dashboard.applyFilters()"><option value="">Todos os Cargos</option></select>
-    </div>
+    <select id="filter-mes" onchange="Dashboard.applyFilters()"><option value="">Mês</option></select>
+    <select id="filter-turno" onchange="Dashboard.applyFilters()"><option value="">Turno</option></select>
+    <select id="filter-cd" onchange="Dashboard.applyFilters()"><option value="">CD</option></select>
+    <select id="filter-cargo" onchange="Dashboard.applyFilters()"><option value="">Cargo</option></select>
 </div>
 
 <div class="kpi-grid" id="kpi-dashboard-geral">
     <div class="kpi-card">
-        <div class="kpi-left">
-            <div class="kpi-label">Total de Registros</div>
-            <div class="kpi-value" id="kpi-total">0</div>
-        </div>
-        <div class="kpi-right">
-            <div class="kpi-icon"><i class="fas fa-clipboard-list"></i></div>
-        </div>
+        <div><div style="color:var(--text-dim)">Registros</div><div class="kpi-value" id="kpi-total">0</div></div>
+        <i class="fas fa-clipboard-list" style="color:var(--shopee-orange)"></i>
     </div>
     <div class="kpi-card">
-        <div class="kpi-left">
-            <div class="kpi-label">Turno Líder</div>
-            <div class="kpi-value" id="kpi-turno">-</div>
-        </div>
-        <div class="kpi-right">
-            <div class="kpi-icon"><i class="fas fa-clock"></i></div> 
-        </div>
+        <div><div style="color:var(--text-dim)">Turno Líder</div><div class="kpi-value" id="kpi-turno">-</div></div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-left">
-            <div class="kpi-label">Meta Operacional</div>
-            <div class="kpi-value">95%</div>
-        </div>
-        <div class="kpi-right">
-            <div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
-        </div>
+        <div><div style="color:var(--text-dim)">Meta</div><div class="kpi-value">95%</div></div>
     </div>
-    <div class="kpi-card idle-card">
-        <div class="kpi-left">
-            <div class="kpi-label">IDLE BRASIL</div>
-            <div class="kpi-value" id="kpi-idle-valor" style="color: var(--accent-cyan);">0%</div>
-        </div>
-        <div class="kpi-right">
-            <div class="kpi-icon cyan"><i class="fas fa-chart-line"></i></div>
-            <div class="kpi-trend trend-cyan" id="kpi-idle-status">Meta: 95%</div>
-        </div>
+    <div class="kpi-card" style="border-color: var(--accent-cyan)">
+        <div><div style="color:var(--text-dim)">IDLE BRASIL</div><div class="kpi-value" id="kpi-idle-valor" style="color:var(--accent-cyan)">0%</div></div>
     </div>
 </div>
 
-<!-- ABA 1: ANÁLISE OPERACIONAL (PADRÃO) -->
 <div id="section-padrao">
-    <div class="charts-container" style="padding-top: 15px;">
-        <div class="chart-box c-span-4">
-            <div class="chart-box-header">
-                <div class="chart-title-left"><i class="fas fa-bolt" style="color: var(--shopee-orange)"></i> Turno</div>
-            </div>
-            <canvas id="chartTurno"></canvas>
-        </div>
-        <div class="chart-box c-span-4">
-            <div class="chart-box-header">
-                <div class="chart-title-left"><i class="fas fa-city" style="color: var(--accent-blue)"></i> CDs</div>
-            </div>
-            <canvas id="chartCD"></canvas>
-        </div>
-        <div class="chart-box c-span-4">
-            <div class="chart-box-header">
-                <div class="chart-title-left"><i class="fas fa-layer-group" style="color: var(--accent-green)"></i> Área</div>
-            </div>
-            <canvas id="chartArea"></canvas>
-        </div>
-        <div class="chart-box c-span-12" style="height: auto; min-height: 250px;">
-            <div class="chart-box-header">
-                <div class="chart-title-left">
-                    <i class="fas fa-th" style="color: var(--accent-yellow)"></i> 
-                    <span>Heatmap Semanal (Volume)</span>
-                </div>
-                <div class="chart-controls">
-                    <select id="dropdownHeatmapCD" onchange="Dashboard.renderHeatmap()"></select>
-                </div>
-            </div>
+    <div class="charts-container">
+        <div class="chart-box" style="grid-column: span 4;"><canvas id="chartTurno"></canvas></div>
+        <div class="chart-box" style="grid-column: span 4;"><canvas id="chartCD"></canvas></div>
+        <div class="chart-box" style="grid-column: span 4;"><canvas id="chartArea"></canvas></div>
+        <div class="chart-box" style="grid-column: span 12; height: auto;">
             <div id="heatmapContainer"></div>
         </div>
     </div>
 </div>
 
-<!-- ABA 2: ANÁLISE SUBPROCESSO -->
 <div id="section-idle" class="hidden">
-    <div class="breadcrumb-bar">
-        <div id="breadcrumb-content" style="color: var(--text-dim);">
-            <i class="fas fa-globe" style="color: var(--accent-blue); margin-right: 5px;"></i>
-            <span style="color: var(--text-main); font-weight: 700;">Brasil</span>
-        </div>
+    <div class="breadcrumb-bar" id="breadcrumb-content">Brasil</div>
+    <div class="kpi-grid">
+        <div class="kpi-card"><div>IDLE<div id="br-idle-val">0%</div></div><div class="kpi-trend" id="br-idle-status">Gap: -95%</div></div>
+        <div class="kpi-card"><div>OPA<div id="br-opa-val">0%</div></div><div class="kpi-trend" id="br-opa-status">Gap: -95%</div></div>
+        <div class="kpi-card"><div>DDSMA<div id="br-ddsma-val">0%</div></div><div class="kpi-trend" id="br-ddsma-status">Gap: -95%</div></div>
+        <div class="kpi-card"><div>DDQA<div id="br-ddqa-val">0%</div></div><div class="kpi-trend" id="br-ddqa-status">Gap: -95%</div></div>
     </div>
-
-    <!-- NÍVEL 1 — VISÃO BRASIL -->
-    <div id="idle-nivel-1">
-        <div class="idle-section-header">
-            <h3 class="idle-section-title" style="color: var(--accent-blue);">
-                <i class="fas fa-globe-americas"></i> NÍVEL 1 — Visão Executiva Brasil
-            </h3>
-        </div>
-        
-        <div class="kpi-grid" style="padding-top: 0;">
-            <div class="kpi-card" style="border-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(57,197,207,0.05), var(--bg-card));">
-                <div class="kpi-left">
-                    <div class="kpi-label">IDLE Brasil</div>
-                    <div class="kpi-value" style="color: var(--accent-cyan);" id="br-idle-val">0%</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
-                    <div class="kpi-trend trend-danger" id="br-idle-status">Gap: -0.0%</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-yellow); background: linear-gradient(135deg, rgba(210,153,34,0.05), var(--bg-card));">
-                <div class="kpi-left">
-                    <div class="kpi-label">OPA Brasil</div>
-                    <div class="kpi-value" style="color: var(--accent-yellow);" id="br-opa-val">0%</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
-                    <div class="kpi-trend trend-warning" id="br-opa-status">Gap: -0.0%</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-green); background: linear-gradient(135deg, rgba(63, 185, 80, 0.05), var(--bg-card));">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDSMA Brasil</div>
-                    <div class="kpi-value" style="color: var(--accent-green);" id="br-ddsma-val">0%</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
-                    <div class="kpi-trend trend-up" id="br-ddsma-status">Meta OK</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-purple); background: linear-gradient(135deg, rgba(137,87,229,0.05), var(--bg-card));">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDQA Brasil</div>
-                    <div class="kpi-value" style="color: var(--accent-purple);" id="br-ddqa-val">0%</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
-                    <div class="kpi-trend trend-danger" id="br-ddqa-status">Gap: -0.0%</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="charts-container" style="padding-top: 5px;">
-            <div class="chart-box c-span-8">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-chart-line" style="color: var(--accent-cyan)"></i> IDLE Nacional por CD</div>
-                </div>
-                <canvas id="chartIdleCD"></canvas>
-            </div>
-            <div class="chart-box c-span-4">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-clock" style="color: var(--accent-yellow)"></i> IDLE Nacional por Turno</div>
-                </div>
-                <canvas id="chartIdleTurno"></canvas>
-            </div>
-        </div>
+    <div class="charts-container">
+        <div class="chart-box" style="grid-column: span 8;"><canvas id="chartIdleCD"></canvas></div>
+        <div class="chart-box" style="grid-column: span 4;"><canvas id="chartIdleTurno"></canvas></div>
     </div>
-
-    <!-- TRANSIÇÃO NÍVEL 2 — SELEÇÃO DE CD -->
-    <div class="nav-transition-box active" id="transition-cd-box">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-arrow-down" style="color: var(--shopee-orange); font-size: 14px;"></i>
-            <span style="font-weight: 700; font-size: 12px; color: var(--text-main);">Selecione um CD para descer um nível hierárquico:</span>
-        </div>
+    <div style="padding: 15px;">
         <select id="idle-cd-selector" class="cd-select-custom" onchange="IdleDashboard.onSelectCD(this.value)">
             <option value="">Selecione o CD</option>
         </select>
     </div>
-
-    <!-- NÍVEL 2 — VISÃO CD -->
     <div id="idle-nivel-2" class="hidden">
-        <div class="idle-section-header">
-            <h3 class="idle-section-title" style="color: var(--shopee-orange);">
-                <i class="fas fa-warehouse"></i> NÍVEL 2 — Visão CD: <span id="cd-display-name" style="color: white; margin-left: 5px;"></span>
-            </h3>
+        <div class="breadcrumb-bar">Visão CD: <span id="cd-display-name"></span></div>
+        <div class="charts-container">
+            <div class="chart-box" style="grid-column: span 12;"><canvas id="chartCdMetaReal"></canvas></div>
         </div>
-
-        <div class="kpi-grid" style="padding-top: 0;">
-            <div class="kpi-card" style="border-color: var(--accent-cyan);">
-                <div class="kpi-left">
-                    <div class="kpi-label">IDLE do CD</div>
-                    <div class="kpi-value" style="color: var(--accent-cyan);" id="cd-idle-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
-                    <div class="kpi-trend" id="cd-idle-status">-</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-yellow);">
-                <div class="kpi-left">
-                    <div class="kpi-label">OPA do CD</div>
-                    <div class="kpi-value" style="color: var(--accent-yellow);" id="cd-opa-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
-                    <div class="kpi-trend" id="cd-opa-status">-</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-green);">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDSMA do CD</div>
-                    <div class="kpi-value" style="color: var(--accent-green);" id="cd-ddsma-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
-                    <div class="kpi-trend" id="cd-ddsma-status">-</div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-purple);">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDQA do CD</div>
-                    <div class="kpi-value" style="color: var(--accent-purple);" id="cd-ddqa-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
-                    <div class="kpi-trend" id="cd-ddqa-status">-</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="charts-container" style="padding-top: 5px;">
-            <div class="chart-box c-span-6">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-chart-line" style="color: var(--accent-green)"></i> Evolução Diária da Meta x Realizado</div>
-                </div>
-                <canvas id="chartCdMetaReal"></canvas>
-            </div>
-            <div class="chart-box c-span-6" style="height: auto; min-height: 230px;">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-th" style="color: var(--accent-yellow)"></i> Heatmap de Utilização por CD</div>
-                </div>
-                <div id="cdHeatmapContainer" style="padding: 5px 0;"></div>
-            </div>
-        </div>
-
-        <!-- TRANSIÇÃO NÍVEL 3 — SELEÇÃO DE ÁREA -->
-        <div class="nav-transition-box" id="transition-area-box">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-arrow-down" style="color: var(--accent-blue); font-size: 14px;"></i>
-                <span style="font-weight: 700; font-size: 12px; color: var(--text-main);">Selecione uma Área operacional do CD selecionado:</span>
-            </div>
+        <div style="padding: 15px;">
             <select id="idle-area-selector" class="cd-select-custom" onchange="IdleDashboard.onSelectArea(this.value)">
                 <option value="">Selecione a Área</option>
             </select>
         </div>
     </div>
-
-    <!-- NÍVEL 3 — ÁREAS DO CD -->
     <div id="idle-nivel-3" class="hidden">
-        <div class="idle-section-header">
-            <h3 class="idle-section-title" style="color: var(--accent-blue);">
-                <i class="fas fa-box"></i> NÍVEL 3 — Área: <span id="area-display-name" style="color: white; margin-left: 5px;"></span>
-            </h3>
-        </div>
-
-        <div class="kpi-grid" style="padding-top: 0;">
-            <div class="kpi-card" style="border-color: var(--accent-cyan);">
-                <div class="kpi-left">
-                    <div class="kpi-label">IDLE da Área</div>
-                    <div class="kpi-value" style="color: var(--accent-cyan);" id="area-idle-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon cyan"><i class="fas fa-industry"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-yellow);">
-                <div class="kpi-left">
-                    <div class="kpi-label">OPA da Área</div>
-                    <div class="kpi-value" style="color: var(--accent-yellow);" id="area-opa-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-yellow); background: rgba(210,153,34,0.1);"><i class="fas fa-tachometer-alt"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-green);">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDSMA da Área</div>
-                    <div class="kpi-value" style="color: var(--accent-green);" id="area-ddsma-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-green); background: rgba(63, 185, 80, 0.1);"><i class="fas fa-shield-alt"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-purple);">
-                <div class="kpi-left">
-                    <div class="kpi-label">DDQA da Área</div>
-                    <div class="kpi-value" style="color: var(--accent-purple);" id="area-ddqa-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-purple); background: rgba(137, 87, 229, 0.1);"><i class="fas fa-check-circle"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="charts-container" style="padding-top: 5px;">
-            <div class="chart-box c-span-6">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-chart-line" style="color: var(--accent-purple)"></i> Distribuição Realizado x Meta</div>
-                </div>
-                <canvas id="chartAreaMetaReal"></canvas>
-            </div>
-            <div class="chart-box c-span-6">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-users" style="color: var(--accent-green)"></i> Desempenho Operacional de Turnos</div>
-                </div>
-                <canvas id="chartAreaTurnos"></canvas>
-            </div>
-        </div>
-
-        <!-- TRANSIÇÃO NÍVEL 4 — SELEÇÃO DE INDICADOR -->
-        <div class="nav-transition-box" id="transition-indicator-box">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-arrow-down" style="color: var(--accent-yellow); font-size: 14px;"></i>
-                <span style="font-weight: 700; font-size: 12px; color: var(--text-main);">Selecione um Indicador específico desta área operacional:</span>
-            </div>
+        <div class="breadcrumb-bar">Área: <span id="area-display-name"></span></div>
+        <div style="padding: 15px;">
             <select id="idle-indicator-selector" class="cd-select-custom" onchange="IdleDashboard.onSelectIndicator(this.value)">
-                <option value="">-- Selecione o Indicador --</option>
+                <option value="">Selecione o Indicador</option>
             </select>
         </div>
-    </div>
-
-    <!-- NÍVEL 4 — DETALHAMENTO COMPLETO -->
-    <div id="idle-nivel-4" class="hidden">
-        <div class="idle-section-header">
-            <h3 class="idle-section-title" style="color: var(--accent-yellow);">
-                <i class="fas fa-chart-bar"></i> NÍVEL 4 — Detalhamento Completo: <span id="indicator-display-name" style="color: white; margin-left: 5px;"></span>
-            </h3>
-        </div>
-
-        <div class="kpi-grid" style="padding-top: 0;">
-            <div class="kpi-card" style="border-color: var(--border);">
-                <div class="kpi-left">
-                    <div class="kpi-label">Meta Definida</div>
-                    <div class="kpi-value" style="color: var(--text-dim);" id="ind-meta-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--text-dim); background: rgba(255, 255, 255, 0.05);"><i class="fas fa-bullseye"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" style="border-color: var(--accent-blue);">
-                <div class="kpi-left">
-                    <div class="kpi-label">Realizado</div>
-                    <div class="kpi-value" style="color: var(--accent-blue);" id="ind-realizado-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" style="color: var(--accent-blue); background: rgba(47, 129, 247, 0.1);"><i class="fas fa-chart-line"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" id="ind-gap-card">
-                <div class="kpi-left">
-                    <div class="kpi-label">Gap Operacional</div>
-                    <div class="kpi-value" id="ind-gap-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" id="ind-gap-icon"><i class="fas fa-minus-circle"></i></div>
-                </div>
-            </div>
-            <div class="kpi-card" id="ind-status-card">
-                <div class="kpi-left">
-                    <div class="kpi-label">Status Analítico</div>
-                    <div class="kpi-value" id="ind-status-val">-</div>
-                </div>
-                <div class="kpi-right">
-                    <div class="kpi-icon" id="ind-status-icon"><i class="fas fa-info-circle"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="charts-container" style="padding-top: 5px;">
-            <div class="chart-box c-span-4">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-calendar-day" style="color: var(--accent-cyan)"></i> Evolução Diária</div>
-                </div>
-                <canvas id="chartIndDaily"></canvas>
-            </div>
-            <div class="chart-box c-span-4">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-calendar-week" style="color: var(--accent-yellow)"></i> Evolução Semanal</div>
-                </div>
-                <canvas id="chartIndWeekly"></canvas>
-            </div>
-            <div class="chart-box c-span-4">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-calendar-alt" style="color: var(--accent-purple)"></i> Evolução Mensal</div>
-                </div>
-                <canvas id="chartIndMonthly"></canvas>
-            </div>
-
-            <!-- Heatmaps de Detalhamento do Indicador -->
-            <div class="chart-box c-span-6" style="height: auto; min-height: 200px;">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-th" style="color: var(--shopee-orange)"></i> Heatmap por Turno</div>
-                </div>
-                <div id="indTurnoHeatmapContainer" style="padding: 10px 0;"></div>
-            </div>
-            <div class="chart-box c-span-6" style="height: auto; min-height: 200px;">
-                <div class="chart-box-header">
-                    <div class="chart-title-left"><i class="fas fa-users" style="color: var(--accent-blue)"></i> Heatmap por Supervisor</div>
-                </div>
-                <div id="indSupervisorHeatmapContainer" style="padding: 10px 0;"></div>
+        <div id="idle-nivel-4" class="hidden">
+            <div class="kpi-grid">
+                <div class="kpi-card"><div>Realizado<div id="ind-realizado-val">0%</div></div></div>
+                <div class="kpi-card"><div>Gap<div id="ind-gap-val">0%</div></div></div>
+                <div class="kpi-card"><div>Status<div id="ind-status-val">-</div></div></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- HISTÓRICO DE RESPOSTAS PADRONIZADO E ALINHADO -->
 <div class="table-section">
     <div class="table-wrapper">
-        <div class="table-header">
-            <div style="font-weight: 700; font-size: 12px;">Histórico Detalhado (Campos Padronizados)</div>
-            <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="tableSearch" placeholder="Pesquisar..." onkeyup="Dashboard.applyFilters()">
-            </div>
-        </div>
-        <div class="table-scroll">
-            <table id="mainTable">
-                <thead>
-                    <tr>
-                        <!-- Colunas reordenadas e renomeadas exatamente conforme solicitado -->
-                        <th>Data Registro</th>
-                        <th>CD</th>
-                        <th>Turno</th>
-                        <th>Nome Responsável</th>
-                        <th>Cargo</th>
-                        <th>Área</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
+        <div style="padding:10px; font-weight:bold;">Histórico Detalhado</div>
+        <table id="mainTable">
+            <thead><tr><th>DATA REGISTRO</th><th>CD</th><th>TURNO</th><th>RESPONSÁVEL</th><th>CARGO</th><th>ÁREA</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
     Chart.register(ChartDataLabels);
-
     const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbycoVam3_qcF0EvFEFwSxklgqS2FyanzIGAXBU26UEeFEfrB7GYx985bjcoRnd09etQ/exec';
-    const CACHE_KEY = 'eos_dashboard_cache';
-    const CACHE_TIME_KEY = 'eos_dashboard_cache_time';
-    const CACHE_DURATION = 30 * 1000; 
-
-    function showToast(msg, persist = false) {
-        const toast = document.getElementById('toastNotification');
-        const toastMsg = document.getElementById('toastMessage');
-        toastMsg.innerText = msg;
-        toast.style.display = 'flex';
-        if (!persist) {
-            setTimeout(() => { toast.style.display = 'none'; }, 5000);
-        }
-    }
     
-    function hideToast() {
-        document.getElementById('toastNotification').style.display = 'none';
-    }
-
-    function showErrorOverlay(msg) {
-        document.getElementById('errorOverlay').style.display = 'flex';
-        document.getElementById('errorMessage').innerText = msg;
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
-
-    function hideErrorOverlay() {
-        document.getElementById('errorOverlay').style.display = 'none';
-    }
-
-    function parseCSV(text) {
-        const lines = text.split(/\r?\n/);
-        if (lines.length === 0) return [];
-        const firstLine = lines[0];
-        const separator = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
-
-        const parseLine = (line) => {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === separator && !inQuotes) { result.push(current.trim()); current = ''; }
-                else current += char;
-            }
-            result.push(current.trim());
-            return result.map(val => val.replace(/^"|"$/g, '').trim());
-        };
-
-        const headers = parseLine(lines[0]);
-        const headerMap = {};
-        
-        // CORREÇÃO LÓGICA: Detecção fuzzy de cabeçalhos para mapear chaves fixas do código
-        headers.forEach((h, idx) => {
-            const n = h.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (n.includes("DATA") || n.includes("CARIMBO")) headerMap.dataHora = idx;
-            else if (n.includes("CD") || n.includes("CENTRO")) headerMap.cd = idx;
-            else if (n.includes("TURNO")) headerMap.turno = idx;
-            else if (n.includes("RESPONSAVEL") || n.includes("NOME")) headerMap.responsavel = idx;
-            else if (n.includes("CARGO")) headerMap.cargo = idx;
-            else if (n.includes("AREA") || n.includes("ATUACAO")) headerMap.area = idx;
-            else headerMap[n] = idx; // Mantém o nome original para outras colunas
-        });
-
-        const data = [];
-        for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue;
-            const cols = parseLine(lines[i]);
-            const obj = {};
-            // Garante que o objeto tenha as chaves esperadas pelo sistema
-            Object.keys(headerMap).forEach(key => {
-                obj[key] = cols[headerMap[key]] || "";
-            });
-            // Atribui especificamente as chaves fixas caso não existam
-            if (!obj.dataHora) obj.dataHora = cols[headerMap.dataHora] || "";
-            if (!obj.cd) obj.cd = cols[headerMap.cd] || "";
-            if (!obj.turno) obj.turno = cols[headerMap.turno] || "";
-            if (!obj.responsavel) obj.responsavel = cols[headerMap.responsavel] || "";
-            if (!obj.cargo) obj.cargo = cols[headerMap.cargo] || "";
-            if (!obj.area) obj.area = cols[headerMap.area] || "";
-            
-            data.push(obj);
-        }
-        return data;
-    }
-
-    async function fetchSpreadsheetData() {
-        try {
-            const response = await fetch(SPREADSHEET_URL);
-            if (!response.ok) throw new Error("Erro HTTP");
-            const text = await response.text();
-            if (text.trim().startsWith("<")) throw new Error("Erro Script Google");
-            const data = parseCSV(text);
-            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-            localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-            document.getElementById('sync-status').innerText = "BASE OPERACIONAL ATIVA";
-            document.getElementById('sync-status').className = "kpi-trend trend-up";
-            return data;
-        } catch (e) {
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) return JSON.parse(cached);
-            throw e;
-        }
+    // Função Auxiliar de Conversão de Dados (Crucial para o 0.0%)
+    function parseValue(val) {
+        if (!val) return 0;
+        let s = val.toString().toUpperCase().trim();
+        if (["SIM", "OK", "REALIZADO", "DENTRO"].includes(s)) return 100;
+        if (["NAO", "NÃO", "PENDENTE", "FORA"].includes(s)) return 0;
+        let n = parseFloat(s.replace("%", "").replace(",", "."));
+        return isNaN(n) ? 0 : n;
     }
 
     const Dashboard = {
-        rawData: [],
-        filteredData: [],
-        charts: {},
-        idleCharts: {},
-        currentMode: 'padrao',
-        extraAreaFilter: '',
-        mesesMapeados: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
-        diasSemanaEixo: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
-        listaCDsGerais: [],
-        turnosEixo: [],
+        rawData: [], filteredData: [], charts: {}, idleCharts: {}, currentMode: 'padrao', extraArea: '',
+        meses: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
 
         async init() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR'), 1000);
+            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString(), 1000);
             try {
-                const data = await fetchSpreadsheetData();
-                this.processSpreadsheetData(data);
+                const res = await fetch(SPREADSHEET_URL);
+                const text = await res.text();
+                this.parseData(text);
                 this.createCharts();
-                this.createIdleCharts();
                 this.applyFilters();
-                document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (e) { showErrorOverlay(e.message); }
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('sync-status').innerText = "BASE ATIVA";
+            } catch (e) { alert("Erro ao carregar dados."); }
         },
 
-        processSpreadsheetData(data) {
-            if (!Array.isArray(data)) data = [];
-            this.rawData = data.map(item => {
-                // CORREÇÃO LÓGICA: Parsing de data robusto
-                const rawDate = item.dataHora || "";
-                const parts = rawDate.split(' ')[0].split('/');
-                let dObj;
-                if (parts.length === 3) {
-                    dObj = new Date(parts[2], parts[1]-1, parts[0]);
-                } else {
-                    dObj = new Date();
-                }
-                
-                const cd = (item.cd || "").toUpperCase().trim();
+        parseData(text) {
+            const rows = text.split(/\r?\n/).map(r => r.split(','));
+            const headers = rows[0].map(h => h.replace(/"/g, '').trim().toUpperCase());
+            
+            // Mapeamento de índices baseado nas colunas oficiais
+            const map = {
+                data: headers.indexOf("DATA REGISTRO"),
+                cd: headers.indexOf("CD OPERACIONAL"),
+                responsavel: headers.indexOf("RESPONSÁVEL"),
+                cargo: headers.indexOf("CARGO"),
+                turno: headers.indexOf("TURNO"),
+                area: headers.indexOf("ÁREA ATUAÇÃO"),
+                idle: headers.indexOf("IDLE TIME %"),
+                opa: headers.indexOf("OPA"),
+                ddsma: headers.indexOf("DDSMA"),
+                ddqa: headers.indexOf("DDQA")
+            };
+
+            this.rawData = rows.slice(1).filter(r => r.length > 5).map(r => {
+                let d = r[map.data] ? r[map.data].split(' ')[0].split('/') : [];
+                let dObj = d.length === 3 ? new Date(d[2], d[1]-1, d[0]) : new Date();
                 return {
-                    ...item,
-                    dataObj: dObj,
-                    cd: cd,
-                    area: (item.area || "").toUpperCase().trim(),
-                    mes: this.mesesMapeados[dObj.getMonth()] || "Janeiro",
-                    diaSemana: this.diasSemanaEixo[dObj.getDay() === 0 ? 6 : dObj.getDay()-1] || "Segunda"
+                    dataHora: r[map.data],
+                    cd: (r[map.cd] || "").toUpperCase().trim(),
+                    responsavel: r[map.responsavel],
+                    cargo: r[map.cargo],
+                    turno: (r[map.turno] || "T1").toUpperCase().trim(),
+                    area: (r[map.area] || "").toUpperCase().trim(),
+                    idle: parseValue(r[map.idle]),
+                    opa: parseValue(r[map.opa]),
+                    ddsma: parseValue(r[map.ddsma]),
+                    ddqa: parseValue(r[map.ddqa]),
+                    mes: this.meses[dObj.getMonth()],
+                    dia: dObj.getDay()
                 };
             });
-            this.listaCDsGerais = [...new Set(this.rawData.map(d => d.cd))].filter(Boolean).sort();
-            this.turnosEixo = [...new Set(this.rawData.map(d => d.turno))].filter(Boolean).sort();
-            this.buildDropdowns();
+            this.updateSelects();
         },
 
-        buildDropdowns() {
-            const inject = (id, list) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const current = el.value;
-                el.innerHTML = `<option value="">Todos</option>` + list.map(v => `<option value="${v}">${v}</option>`).join('');
-                el.value = current;
+        updateSelects() {
+            const fill = (id, key) => {
+                const list = [...new Set(this.rawData.map(d => d[key]))].filter(Boolean).sort();
+                document.getElementById(id).innerHTML = `<option value="">${id.split('-')[1]}</option>` + list.map(v => `<option value="${v}">${v}</option>`).join('');
             };
-            inject('filter-mes', this.mesesMapeados);
-            inject('filter-turno', this.turnosEixo);
-            inject('filter-cd', this.listaCDsGerais);
-            inject('filter-cargo', [...new Set(this.rawData.map(d => d.cargo))].filter(Boolean).sort());
-            
-            const dropHeat = document.getElementById('dropdownHeatmapCD');
-            if (dropHeat) {
-                dropHeat.innerHTML = `<option value="GERAL">Visão Geral</option>` + this.listaCDsGerais.map(v => `<option value="${v}">${v}</option>`).join('');
-            }
+            fill('filter-mes', 'mes'); fill('filter-turno', 'turno'); fill('filter-cd', 'cd'); fill('filter-cargo', 'cargo');
         },
 
         applyFilters() {
@@ -1046,257 +352,126 @@
             const fT = document.getElementById('filter-turno').value;
             const fC = document.getElementById('filter-cd').value;
             const fCa = document.getElementById('filter-cargo').value;
-            const fS = document.getElementById('tableSearch').value.toLowerCase();
 
             this.filteredData = this.rawData.filter(d => {
                 if (fM && d.mes !== fM) return false;
                 if (fT && d.turno !== fT) return false;
                 if (fC && d.cd !== fC) return false;
                 if (fCa && d.cargo !== fCa) return false;
-                if (this.extraAreaFilter && d.area !== this.extraAreaFilter) return false;
-                if (fS && !d.responsavel.toLowerCase().includes(fS)) return false;
+                if (this.extraArea && d.area !== this.extraArea) return false;
                 return true;
             });
 
             this.updateKPIs();
-            this.updateChartsData();
-            this.renderHeatmap();
+            this.updateCharts();
             this.renderTable();
-            if (this.currentMode === 'idle') IdleDashboard.refreshData();
+            if (this.currentMode === 'idle') IdleDashboard.refresh();
         },
 
         updateKPIs() {
             document.getElementById('kpi-total').innerText = this.filteredData.length;
-            // CORREÇÃO LÓGICA: Busca exata pelo IDLE TIME % conforme regra
-            const idle = IdleDashboard.calculateRealMetric(this.filteredData, "IDLE");
-            const el = document.getElementById('kpi-idle-valor');
-            if (el) {
-                el.innerText = idle.toFixed(1) + "%";
-                el.style.color = idle >= 95 ? 'var(--accent-green)' : (idle >= 90 ? 'var(--accent-yellow)' : 'var(--shopee-orange)');
-            }
-            
-            const turnos = {};
-            this.filteredData.forEach(d => {
-                if(d.turno) turnos[d.turno] = (turnos[d.turno] || 0) + 1;
-            });
-            document.getElementById('kpi-turno').innerText = Object.keys(turnos).sort((a,b) => turnos[b]-turnos[a])[0] || "-";
+            const idleAvg = this.filteredData.reduce((a, b) => a + b.idle, 0) / (this.filteredData.length || 1);
+            document.getElementById('kpi-idle-valor').innerText = idleAvg.toFixed(1) + "%";
         },
 
         createCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', font: { weight: 'bold', size: 9 } } } };
-            this.charts.turno = new Chart(document.getElementById('chartTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#ee4d2d', data: [] }] }, options: opt });
-            this.charts.cd = new Chart(document.getElementById('chartCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#2f81f7', data: [] }] }, options: opt });
-            this.charts.area = new Chart(document.getElementById('chartArea'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#8957e5', data: [] }] }, options: { ...opt, indexAxis: 'y' } });
+            const config = (ctx, color) => ({ type: 'bar', data: { labels: [], datasets: [{ backgroundColor: color, data: [] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false } } });
+            this.charts.turno = new Chart(document.getElementById('chartTurno'), config('chartTurno', '#ee4d2d'));
+            this.charts.cd = new Chart(document.getElementById('chartCD'), config('chartCD', '#2f81f7'));
+            this.charts.area = new Chart(document.getElementById('chartArea'), { ...config('chartArea', '#8957e5'), options: { indexAxis: 'y', plugins: { legend: false } } });
+            
+            this.idleCharts.cd = new Chart(document.getElementById('chartIdleCD'), config('chartIdleCD', '#39c5cf'));
+            this.idleCharts.turno = new Chart(document.getElementById('chartIdleTurno'), config('chartIdleTurno', '#d29922'));
         },
 
-        createIdleCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } };
-            this.idleCharts.cd = new Chart(document.getElementById('chartIdleCD'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#39c5cf', data: [] }] }, options: opt });
-            this.idleCharts.turno = new Chart(document.getElementById('chartIdleTurno'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#d29922', data: [] }] }, options: opt });
-        },
-
-        updateChartsData() {
-            this.charts.turno.data.labels = this.turnosEixo;
-            this.charts.turno.data.datasets[0].data = this.turnosEixo.map(t => this.filteredData.filter(d => d.turno === t).length);
-            this.charts.turno.update();
-
-            this.charts.cd.data.labels = this.listaCDsGerais;
-            this.charts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => this.filteredData.filter(d => d.cd === c).length);
-            this.charts.cd.update();
-
-            const areas = [...new Set(this.rawData.map(d => d.area))].filter(Boolean).sort();
-            this.charts.area.data.labels = areas;
-            this.charts.area.data.datasets[0].data = areas.map(a => this.filteredData.filter(d => d.area === a).length);
-            this.charts.area.update();
-
-            this.idleCharts.cd.data.labels = this.listaCDsGerais;
-            this.idleCharts.cd.data.datasets[0].data = this.listaCDsGerais.map(c => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.cd === c), "IDLE"));
-            this.idleCharts.cd.update();
-
-            this.idleCharts.turno.data.labels = this.turnosEixo;
-            this.idleCharts.turno.data.datasets[0].data = this.turnosEixo.map(t => IdleDashboard.calculateRealMetric(this.rawData.filter(d => d.turno === t), "IDLE"));
-            this.idleCharts.turno.update();
-        },
-
-        renderHeatmap() {
-            const dropHeat = document.getElementById('dropdownHeatmapCD');
-            const target = dropHeat ? dropHeat.value : "GERAL";
-            const data = target === "GERAL" ? this.filteredData : this.filteredData.filter(d => d.cd === target);
-            const matrix = {};
-            const turnos = ["T1", "T2", "T3"];
-            turnos.forEach(t => { matrix[t] = {}; this.diasSemanaEixo.forEach(d => matrix[t][d] = 0); });
-            data.forEach(d => { if(matrix[d.turno] && matrix[d.turno][d.diaSemana] !== undefined) matrix[d.turno][d.diaSemana]++; });
-
-            let h = `<div class="heatmap-grid"><div></div>` + this.diasSemanaEixo.map(d => `<div class="heatmap-header-cell">${d.substring(0,3)}</div>`).join('') + `</div>`;
-            turnos.forEach(t => {
-                h += `<div class="heatmap-grid"><div class="heatmap-row-label">${t}</div>` + this.diasSemanaEixo.map(d => {
-                    const c = matrix[t][d];
-                    const a = c > 0 ? Math.min(c/5, 0.9) : 0.05;
-                    return `<div class="heatmap-cell" style="background:rgba(238,77,45,${a})"><span class="count">${c}</span></div>`;
-                }).join('') + `</div>`;
+        updateCharts() {
+            const update = (chart, key) => {
+                const groups = {};
+                this.filteredData.forEach(d => groups[d[key]] = (groups[d[key]] || 0) + 1);
+                chart.data.labels = Object.keys(groups);
+                chart.data.datasets[0].data = Object.values(groups);
+                chart.update();
+            };
+            update(this.charts.turno, 'turno'); update(this.charts.cd, 'cd'); update(this.charts.area, 'area');
+            
+            // Gráficos de IDLE Real
+            const cds = [...new Set(this.rawData.map(d => d.cd))];
+            this.idleCharts.cd.data.labels = cds;
+            this.idleCharts.cd.data.datasets[0].data = cds.map(c => {
+                const rows = this.rawData.filter(d => d.cd === c);
+                return rows.reduce((a,b) => a + b.idle, 0) / (rows.length || 1);
             });
-            const cont = document.getElementById('heatmapContainer');
-            if (cont) cont.innerHTML = h;
+            this.idleCharts.cd.update();
         },
 
         renderTable() {
-            const tb = document.getElementById('tableBody');
-            if (tb) {
-                tb.innerHTML = this.filteredData.slice(0, 100).map(d => `
-                    <tr><td>${d.dataHora}</td><td>${d.cd}</td><td>${d.turno}</td><td>${d.responsavel}</td><td>${d.cargo}</td><td>${d.area}</td></tr>
-                `).join('');
-            }
+            document.getElementById('tableBody').innerHTML = this.filteredData.slice(0, 50).map(d => `
+                <tr><td>${d.dataHora}</td><td>${d.cd}</td><td>${d.turno}</td><td>${d.responsavel}</td><td>${d.cargo}</td><td>${d.area}</td></tr>
+            `).join('');
         },
 
         toggleAnalysisMode() {
             this.currentMode = document.getElementById('analysis-mode').value;
             document.getElementById('section-padrao').classList.toggle('hidden', this.currentMode === 'idle');
             document.getElementById('section-idle').classList.toggle('hidden', this.currentMode === 'padrao');
-            document.getElementById('kpi-dashboard-geral').classList.toggle('hidden', this.currentMode === 'idle');
-            if (this.currentMode === 'idle') IdleDashboard.init();
+            if(this.currentMode === 'idle') IdleDashboard.init();
         }
     };
 
     const IdleDashboard = {
-        cdSelected: '', areaSelected: '', indicatorSelected: '', charts: {},
-
-        // CORREÇÃO LÓGICA: Buscador de métricas inteligente para colunas da planilha
-        calculateRealMetric(rows, metricName) {
-            if (!Array.isArray(rows) || rows.length === 0) return 0;
-            let sum = 0, count = 0;
-            const targetKey = metricName.toUpperCase().trim();
-            
-            rows.forEach(r => {
-                // Procura a coluna que contenha o nome da métrica (Ex: busca "IDLE" e encontra "IDLE TIME %")
-                const actualKey = Object.keys(r).find(k => k.toUpperCase().includes(targetKey));
-                const val = r[actualKey];
-                if (val === undefined || val === null || val === "") return;
-                
-                let n = 0;
-                const s = val.toString().toUpperCase().trim();
-                if (["SIM", "OK", "REALIZADO"].includes(s)) n = 100;
-                else if (["NAO", "NÃO", "PENDENTE"].includes(s)) n = 0;
-                else n = parseFloat(s.replace("%", "").replace(",", "."));
-                
-                if (!isNaN(n)) { sum += n; count++; }
-            });
-            return count > 0 ? sum / count : 0;
-        },
+        cd: '', area: '', charts: {},
 
         init() {
-            this.refreshData();
-            const sel = document.getElementById('idle-cd-selector');
-            if (sel) {
-                sel.innerHTML = `<option value="">Selecione o CD</option>` + Dashboard.listaCDsGerais.map(c => `<option value="${c}">${c}</option>`).join('');
-            }
+            const cds = [...new Set(Dashboard.rawData.map(d => d.cd))].filter(Boolean);
+            document.getElementById('idle-cd-selector').innerHTML = '<option value="">Selecione o CD</option>' + cds.map(c => `<option value="${c}">${c}</option>`).join('');
+            this.refresh();
         },
 
-        refreshData() {
-            this.renderLevel1Brasil();
-            if (this.cdSelected) this.renderCdLevel();
-            if (this.areaSelected) this.renderAreaLevel();
-            if (this.indicatorSelected) this.renderIndicatorLevel();
-        },
-
-        renderLevel1Brasil() {
+        refresh() {
             const data = Dashboard.rawData;
-            const idle = this.calculateRealMetric(data, "IDLE");
-            const opa = this.calculateRealMetric(data, "OPA");
-            const ddsma = this.calculateRealMetric(data, "DDSMA");
-            const ddqa = this.calculateRealMetric(data, "DDQA");
-
-            const update = (id, val, meta) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                el.innerText = val.toFixed(1) + "%";
-                const parent = el.parentElement.nextElementSibling;
-                if (parent) {
-                    const trend = parent.querySelector('.kpi-trend');
-                    if (trend) {
-                        trend.innerText = val >= meta ? "Meta OK" : "Gap: " + (val - meta).toFixed(1) + "%";
-                        trend.className = "kpi-trend " + (val >= meta ? "trend-up" : "trend-danger");
-                    }
-                }
-            };
-            update('br-idle-val', idle, 95);
-            update('br-opa-val', opa, 95);
-            update('br-ddsma-val', ddsma, 95);
-            update('br-ddqa-val', ddqa, 95);
+            const avg = (key) => (data.reduce((a, b) => a + b[key], 0) / (data.length || 1)).toFixed(1) + "%";
+            document.getElementById('br-idle-val').innerText = avg('idle');
+            document.getElementById('br-opa-val').innerText = avg('opa');
+            document.getElementById('br-ddsma-val').innerText = avg('ddsma');
+            document.getElementById('br-ddqa-val').innerText = avg('ddqa');
         },
 
-        onSelectCD(cd) {
-            this.cdSelected = cd; this.areaSelected = ''; this.indicatorSelected = '';
-            document.getElementById('cd-display-name').innerText = cd || "-";
-            document.getElementById('idle-nivel-2').classList.toggle('hidden', !cd);
-            if (!cd) return;
-            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === cd).map(d => d.area))].filter(Boolean).sort();
-            const selArea = document.getElementById('idle-area-selector');
-            if (selArea) {
-                selArea.innerHTML = `<option value="">Selecione</option>` + areas.map(a => `<option value="${a}">${a}</option>`).join('');
-            }
-            this.renderCdLevel();
+        onSelectCD(val) {
+            this.cd = val;
+            document.getElementById('cd-display-name').innerText = val;
+            document.getElementById('idle-nivel-2').classList.remove('hidden');
+            const areas = [...new Set(Dashboard.rawData.filter(d => d.cd === val).map(d => d.area))];
+            document.getElementById('idle-area-selector').innerHTML = '<option value="">Área</option>' + areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            this.renderCdChart();
         },
 
-        renderCdLevel() {
-            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected);
-            document.getElementById('cd-idle-val').innerText = this.calculateRealMetric(data, "IDLE").toFixed(1) + "%";
-            document.getElementById('cd-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
-            document.getElementById('cd-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
-            document.getElementById('cd-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
-            this.renderCdCharts();
+        renderCdChart() {
+            const ctx = document.getElementById('chartCdMetaReal').getContext('2d');
+            if(this.charts.cd) this.charts.cd.destroy();
+            const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+            const data = days.map((_, i) => {
+                const rows = Dashboard.rawData.filter(d => d.cd === this.cd && d.dia === i);
+                return rows.reduce((a,b) => a + b.idle, 0) / (rows.length || 1);
+            });
+            this.charts.cd = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: 'Realizado', data: data, borderColor: '#00f2fe' }, { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }] }, options: { responsive: true, maintainAspectRatio: false } });
         },
 
-        renderCdCharts() {
-            const can = document.getElementById('chartCdMetaReal');
-            if (!can) return;
-            const ctx = can.getContext('2d');
-            if (this.charts.cdLine) this.charts.cdLine.destroy();
-            const days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-            const data = days.map(d => this.calculateRealMetric(Dashboard.rawData.filter(r => r.cd === this.cdSelected && r.diaSemana === d), "IDLE"));
-            this.charts.cdLine = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: 'Real', data: data, borderColor: '#00f2fe', tension: 0.4 }, { label: 'Meta', data: Array(7).fill(95), borderColor: '#ee4d2d', borderDash: [5,5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        onSelectArea(val) {
+            this.area = val;
+            document.getElementById('area-display-name').innerText = val;
+            document.getElementById('idle-nivel-3').classList.remove('hidden');
+            const inds = ["IDLE TIME %", "OPA", "DDSMA", "DDQA"];
+            document.getElementById('idle-indicator-selector').innerHTML = '<option value="">Indicador</option>' + inds.map(i => `<option value="${i}">${i}</option>`).join('');
         },
 
-        onSelectArea(area) {
-            this.areaSelected = area; this.indicatorSelected = '';
-            document.getElementById('area-display-name').innerText = area || "-";
-            document.getElementById('idle-nivel-3').classList.toggle('hidden', !area);
-            if (!area) return;
-            const inds = ["DDSMA", "DDQA", "IDLE TIME %", "OPA"];
-            const selInd = document.getElementById('idle-indicator-selector');
-            if (selInd) {
-                selInd.innerHTML = `<option value="">Selecione</option>` + inds.map(i => `<option value="${i}">${i}</option>`).join('');
-            }
-            this.renderAreaLevel();
-        },
-
-        renderAreaLevel() {
-            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            document.getElementById('area-idle-val').innerText = this.calculateRealMetric(data, "IDLE").toFixed(1) + "%";
-            document.getElementById('area-opa-val').innerText = this.calculateRealMetric(data, "OPA").toFixed(1) + "%";
-            document.getElementById('area-ddsma-val').innerText = this.calculateRealMetric(data, "DDSMA").toFixed(1) + "%";
-            document.getElementById('area-ddqa-val').innerText = this.calculateRealMetric(data, "DDQA").toFixed(1) + "%";
-        },
-
-        onSelectIndicator(ind) {
-            this.indicatorSelected = ind;
-            document.getElementById('indicator-display-name').innerText = ind || "-";
-            document.getElementById('idle-nivel-4').classList.toggle('hidden', !ind);
-            if (ind) this.renderIndicatorLevel();
-        },
-
-        renderIndicatorLevel() {
-            const data = Dashboard.rawData.filter(d => d.cd === this.cdSelected && d.area === this.areaSelected);
-            const val = this.calculateRealMetric(data, this.indicatorSelected);
-            document.getElementById('ind-meta-val').innerText = "95.0%";
-            document.getElementById('ind-realizado-val').innerText = val.toFixed(1) + "%";
-            const gap = val - 95;
-            const gEl = document.getElementById('ind-gap-val');
-            if (gEl) {
-                gEl.innerText = (gap >= 0 ? "+" : "") + gap.toFixed(1) + "%";
-                gEl.style.color = gap >= 0 ? 'var(--accent-green)' : 'var(--shopee-orange)';
-            }
-            const sEl = document.getElementById('ind-status-val');
-            if (sEl) sEl.innerText = gap >= 0 ? "DENTRO DA META" : "FORA DA META";
+        onSelectIndicator(val) {
+            document.getElementById('idle-nivel-4').classList.remove('hidden');
+            const key = val.includes("IDLE") ? "idle" : val.toLowerCase();
+            const rows = Dashboard.rawData.filter(d => d.cd === this.cd && d.area === this.area);
+            const res = rows.reduce((a,b) => a + b[key], 0) / (rows.length || 1);
+            document.getElementById('ind-realizado-val').innerText = res.toFixed(1) + "%";
+            document.getElementById('ind-gap-val').innerText = (res - 95).toFixed(1) + "%";
+            document.getElementById('ind-status-val').innerText = res >= 95 ? "META OK" : "ABAIXO";
         }
     };
 
